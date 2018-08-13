@@ -6,7 +6,9 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   # Default to installing in SOEM source directory
   set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install)
 endif()
+# Relative path of SOEM-master
 set(WORK_SPACE ../SOEM-master)
+#
 set(SOEM_INCLUDE_INSTALL_DIR ${WORK_SPACE}/include/soem)
 set(SOEM_LIB_INSTALL_DIR ${WORK_SPACE}/lib)
 set(BUILD_TESTS TRUE)
