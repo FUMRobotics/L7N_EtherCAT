@@ -9,6 +9,7 @@ endif()
 # Relative path of SOEM-master
 set(WORK_SPACE ../SOEM-master)
 #
+lknhfvlhevilheihvoih
 set(SOEM_INCLUDE_INSTALL_DIR ${WORK_SPACE}/include/soem)
 set(SOEM_LIB_INSTALL_DIR ${WORK_SPACE}/lib)
 set(BUILD_TESTS TRUE)
