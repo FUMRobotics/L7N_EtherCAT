@@ -25,10 +25,10 @@ int main(int argc, char *argv[])
    if (argc > 1)
    {
 		mecapion_test(argv[1]);
-		/* Lines 211 to 221 of slaveinfo.c */
+		/* Inspired by lines 211 to 221 of slaveinfo.c */
 		int controlVal = 0; uint16 rdat;
 		rdl = sizeof(rdat); rdat = 0;
-		int controlVal = ec_SDOread(1, 0x6040, 0x00, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
+		controlVal = ec_SDOread(1, 0x6040, 0x00, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
 		printf(%d, controlVal);
 		/***********************************/
 		
