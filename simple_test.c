@@ -25,15 +25,27 @@ int main(int argc, char *argv[])
    if (argc > 1)
    {
 		mecapion_test(argv[1]);
+		int result;
 		/* Inspird by line 222 to 225 of ebox.c */
 		int16 objectValue = 0x7;
 		objectSize = sizeof(objectValue);
-		ec_SDOwrite(1,0x6040, 0x00, FALSE, objectSize, objectValue, EC_TIMEOUTRXM);
+		result = ec_SDOwrite(1,0x6040, 0x00, FALSE, objectSize, &objectValue, EC_TIMEOUTRXM);
+		if (result == 0) 
+		{	
+			printf("SDO write unsucessful\n")
+			return 0;
+		}
 		/* Inspired by lines 211 to 221 of slaveinfo.c */
-		int controlRead = 0; uint16 rdat;
+		uint16 rdat;
 		rdl = sizeof(rdat); rdat = 0;
-		controlRead = ec_SDOread(1, 0x6040, 0x00, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
-		printf(%d, controlRead);
+		result = ec_SDOread(1, 0x6040, 0x00, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
+		if (result == 0)
+		{
+			printf("SDO read unsucessful\n");
+			return 0;
+		}
+		else printf("Value of OD the entry is %d\n", rdat);
+
 		/***********************************/
 		
    }
