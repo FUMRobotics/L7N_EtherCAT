@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
    if (argc > 1)
    {
 		mecapion_test(argv[1]);
+		/* Check whether SDO read/write is successful */
 		int result;
 		/* Inspird by line 222 to 225 of ebox.c */
 		int16 objectValue = 0x7;
@@ -37,6 +38,7 @@ int main(int argc, char *argv[])
 		}
 		/* Inspired by lines 211 to 221 of slaveinfo.c */
 		uint16 rdat;
+		/* rdat = read data, rdl = read data length */
 		rdl = sizeof(rdat); rdat = 0;
 		result = ec_SDOread(1, 0x6040, 0x00, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
 		if (result == 0)
@@ -44,7 +46,7 @@ int main(int argc, char *argv[])
 			printf("SDO read unsucessful\n");
 			return 0;
 		}
-		else printf("Value of rhe OD entry is %d\n", rdat);
+		else printf("Value of the OD entry is %d\n", rdat);
 
 		/***********************************/
 		
