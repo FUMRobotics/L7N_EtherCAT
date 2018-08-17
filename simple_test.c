@@ -2,7 +2,7 @@
  * Usage : simple_test [ifname1]
  * ifname is NIC interface, f.e. eth0
  *
- * Derived from https://github.com/OpenEtherCATsociety/SOEM
+ * Also see https://github.com/OpenEtherCATsociety/SOEM/blob/master/test/linux/simple_test/simple_test.c
  */
  
 #include "ethercat.h"
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 		}
 		/* Inspired by lines 211 to 221 of slaveinfo.c */
 		uint16 rdat;
-		/* rdat = read data, rdl = read data length */
+		/* rdat = read data, rdl = read data length (read as past sentence of read)*/
 		rdl = sizeof(rdat); rdat = 0;
 		result = ec_SDOread(1, 0x6040, 0x00, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
 		if (result != 0)
