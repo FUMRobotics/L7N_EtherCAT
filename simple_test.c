@@ -2,7 +2,6 @@
  * Usage : simple_test [ifname1]
  * ifname is NIC interface, f.e. eth0
  *
- * Also see https://github.com/OpenEtherCATsociety/SOEM/blob/master/test/linux/simple_test/simple_test.c
  */
  
 #include "ethercat.h"
@@ -10,10 +9,14 @@
 #include <string.h>
 #include <string.h>
 
-void mecapion_test (char *ifname){
-	
-if(ec_init(ifname))
+void initialize (char *ifname){
+/* See https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */	
+
+if (ec_init(ifname))
 	printf("ec_init on %s succeeded. \n",ifname);
+
+if (ec_config_init(FALSE) > 0)
+	fprintf("%d slaves found and set to PRE_OP state", ec_slavecount);
 
 }
 
@@ -24,7 +27,7 @@ int main(int argc, char *argv[])
 
    if (argc > 1)
    {
-		mecapion_test(argv[1]);
+		initialize(argv[1]);
 		/* Check whether SDO read/write is successful */
 		int result;
 		/* Inspird by line 222 to 225 of ebox.c */
