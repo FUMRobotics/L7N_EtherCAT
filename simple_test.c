@@ -41,12 +41,13 @@ int main(int argc, char *argv[])
 		/* rdat = read data, rdl = read data length */
 		rdl = sizeof(rdat); rdat = 0;
 		result = ec_SDOread(1, 0x6040, 0x00, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
-		if (result == 0)
+		if (result != 0)
 		{
-			printf("SDO read unsucessful\n");
+			printf("Value of the OD entry is %d\n", rdat);
 			return 0;
 		}
-		else printf("Value of the OD entry is %d\n", rdat);
+			
+		else printf("SDO read unsucessful\n");
 
 		/***********************************/
 		
