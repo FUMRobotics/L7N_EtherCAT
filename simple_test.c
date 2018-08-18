@@ -9,15 +9,23 @@
 #include <string.h>
 #include <string.h>
 
-void initialize (char *ifname){
+void initialize (char *ifname)
+{
 /* See https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */	
 
-if (ec_init(ifname))
-	printf("ec_init on %s succeeded. \n",ifname);
+	if (ec_init(ifname))
+	{
+		printf("ec_init on %s succeeded. \n",ifname);
 
-if (ec_config_init(FALSE) > 0)
-	printf("%d slaves found and set to PRE_OP state", ec_slavecount);
-
+		if (ec_config_init(FALSE) > 0)
+		{		
+			printf("%d slaves found and PRE_OP state requested\n", ec_slavecount);
+				/* See red_test line 55 */
+				/* Passing 0 for the first argument means check All slaves */
+				if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) > 0)
+					printf("All slaves reached PRE_OP state\n");
+		}
+	}
 }
 
 int main(int argc, char *argv[])
