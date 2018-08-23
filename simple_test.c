@@ -24,8 +24,8 @@ void initialize (char* ifname)
 			printf("%d slaves found and PRE_OP state requested\n", ec_slavecount);
 				/* See red_test line 55 */
 				/* Passing 0 for the first argument means check All slaves */
-				/* ec_statecheck returns the value of the state, as defiend in ethercattypes.h (i.e. 4 for safe-op) */
-		        /* In case the fisrt argument is 0, it returns the value of the lowest state of all the slaves */
+				/* ec_statecheck returns the value of the state, as defiend in ethercattypes.h (i.e. 4 for safe-op). 
+		           In case the fisrt argument is 0, it returns the value of the lowest state of all the slaves */
 				if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
 					printf("All slaves reached PRE_OP state\n");
 				
