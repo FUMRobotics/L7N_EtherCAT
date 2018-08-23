@@ -11,7 +11,7 @@
 /* The size is a placeholder */
 char IOmap[4096];
 
-void initialize (char *ifname)
+void initialize (char* ifname)
 {
 /* See https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */	
 
@@ -24,14 +24,20 @@ void initialize (char *ifname)
 			printf("%d slaves found and PRE_OP state requested\n", ec_slavecount);
 				/* See red_test line 55 */
 				/* Passing 0 for the first argument means check All slaves */
+				/* ec_statecheck returns the value of the state, as defiend in ethercattypes.h (i.e. 4 for safe-op) */
+		        /* In case the fisrt argument is 0, it returns the value of the lowest state of all the slaves */
 				if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
 					printf("All slaves reached PRE_OP state\n");
 				
-				/* Comment required */
+				/* Due to a bug in EtherCAT implementation by Mecapion, we have to manually
+				   enable syncmanagers 2 & 3, which are associated with TPDO and RPDOs 
+				   respectively (p.26 of EtherCAT slave implementation guide). For more info,
+				   refer to SOEM issue #198 */
 				ec_slave[1].SM[2].SMflags |= EC_SMENABLEMASK;
 				ec_slave[1].SM[3].SMflags |= EC_SMENABLEMASK;
 
-				/* Comment required */
+				/* To do: - Run slaveinfo and this code without ec_config_map(&IOmap)
+                          - Find out what ec_config_map does */
  				ec_config_map(&IOmap);
 		}
 	}
@@ -46,15 +52,14 @@ int main(int argc, char *argv[])
    {
 		initialize(argv[1]);
 		
+		/* Specify the desired state for the slave and then write it */
 		ec_slave[1].state = EC_STATE_SAFE_OP;
 		ec_writestate(1);
 		
-		/* ec_statecheck returns the value of the state defiend in ethercattypes.h (i.e. 4 for safe-op) */
-		/* In case the fisrt argument is 0, it return the value of the lowest state of all slaves */
 		if (ec_statecheck(1, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE) == EC_STATE_SAFE_OP)
 			printf("Slave 1 reached SAFE_OP state\n");
 		
-		/* From slaveinfo.c, I guess */
+		/* Line 122 of the original simple_test */
 		printf("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", 1, ec_slave[1].state, ec_slave[1].ALstatuscode, ec_ALstatuscode2string(ec_slave[1].ALstatuscode));
         
 		/* Note that we can use SDOread/write after ec_config_init(FALSE), since init state is sufficient for SDO communication */
@@ -81,8 +86,6 @@ int main(int argc, char *argv[])
 		}
 			
 		else printf("SDO read unsucessful\n");
-
-		/***********************************/
 		
    }
    else
