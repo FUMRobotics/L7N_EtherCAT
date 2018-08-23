@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <string.h>
+/* The size is a placeholder */
+char IOmap[4096];
 
 void initialize (char *ifname)
 {
@@ -24,6 +26,13 @@ void initialize (char *ifname)
 				/* Passing 0 for the first argument means check All slaves */
 				if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
 					printf("All slaves reached PRE_OP state\n");
+				
+				/* Comment required */
+				ec_slave[1].SM[2].SMflags |= EC_SMENABLEMASK;
+				ec_slave[1].SM[3].SMflags |= EC_SMENABLEMASK;
+
+				/* Comment required */
+ 				ec_config_map(&IOmap);
 		}
 	}
 }
@@ -36,6 +45,19 @@ int main(int argc, char *argv[])
    if (argc > 1)
    {
 		initialize(argv[1]);
+		
+		ec_slave[1].state = EC_STATE_SAFE_OP;
+		ec_writestate(1);
+		
+		/* ec_statecheck returns the value of the state defiend in ethercattypes.h (i.e. 4 for safe-op) */
+		/* In case the fisrt argument is 0, it return the value of the lowest state of all slaves */
+		if (ec_statecheck(1, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE) == EC_STATE_SAFE_OP)
+			printf("Slave 1 reached SAFE_OP state\n");
+		
+		/* From slaveinfo.c, I guess */
+		printf("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", 1, ec_slave[1].state, ec_slave[1].ALstatuscode, ec_ALstatuscode2string(ec_slave[1].ALstatuscode));
+        
+		/* Note that we can use SDOread/write after ec_config_init(FALSE), since init state is sufficient for SDO communication */
 		/* Check whether SDO read/write is successful */
 		int result;
 		/* Inspird by line 222 to 225 of ebox.c */
