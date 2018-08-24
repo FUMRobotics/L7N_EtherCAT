@@ -28,7 +28,7 @@ void initialize (char* ifname)
 				/* See red_test line 55 */
 				/* Passing 0 for the first argument means check All slaves */
 				/* ec_statecheck returns the value of the state, as defiend in ethercattypes.h (i.e. 4 for safe-op). 
-		           In case the fisrt argument is 0, it returns the value of the lowest state of all the slaves */
+		           In case the fisrt argument is 0, it returns the value of the lowest state among all the slaves */
 				if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
 					printf("All slaves reached PRE_OP state\n");
 				
@@ -44,6 +44,40 @@ void initialize (char* ifname)
  				ec_config_map(&IOmap);
 		}
 	}
+}
+
+void ODwrite(uint16 slaveNum, uint16 Index, uint8 SubIndex, int16 objectValue)
+{
+		/* For checking whether SDO write is successful */
+		int result;
+		/* Inspird by line 222 to 225 of ebox.c */
+		int objectSize = sizeof(objectValue);
+		result = ec_SDOwrite(slaveNum, Index, subIndex, FALSE, objectSize, objectValue, EC_TIMEOUTRXM);
+		//result = ec_SDOwrite(1,0x6040, 0x00, FALSE, objectSize, &objectValue, EC_TIMEOUTRXM);
+		if (result == 0) 
+			printf("SDO write unsucessful\n");
+}
+
+uint16 ODread(uint16 slaveNum, uint16 Index, uint8 SubIndex)
+{
+		/* For checking whether SDO write is successful */
+		int result;
+		/* Inspired by lines 211 to 221 of slaveinfo.c */
+		uint16 rdat;
+		/* rdat = read data, rdl = read data length (read as past sentence of read)*/
+		int rdl = sizeof(rdat); rdat = 0;
+		result = ec_SDOread(slaveNum, Index, subIndex, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
+		if (result != 0)
+		{
+			printf("Value of the OD entry is %d\n", rdat);
+			return rdat;
+		}
+			
+		else 
+		{	
+			printf("SDO read unsucessful\n");
+			return 0;
+		}
 }
 
 int main(int argc, char *argv[])
@@ -65,30 +99,11 @@ int main(int argc, char *argv[])
 		/* Line 122 of the original simple_test */
 		printf("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", 1, ec_slave[1].state, ec_slave[1].ALstatuscode, ec_ALstatuscode2string(ec_slave[1].ALstatuscode));
         
-		/* Note that we can use SDOread/write after ec_config_init(FALSE), since init state is sufficient for SDO communication */
-		/* Check whether SDO read/write is successful */
-		int result;
-		/* Inspird by line 222 to 225 of ebox.c */
-		int16 objectValue = 0x7;
-		int objectSize = sizeof(objectValue);
-		result = ec_SDOwrite(1,0x6040, 0x00, FALSE, objectSize, &objectValue, EC_TIMEOUTRXM);
-		if (result == 0) 
-		{	
-			printf("SDO write unsucessful\n");
-			
-		}
-		/* Inspired by lines 211 to 221 of slaveinfo.c */
-		uint16 rdat;
-		/* rdat = read data, rdl = read data length (read as past sentence of read)*/
-		int rdl = sizeof(rdat); rdat = 0;
-		result = ec_SDOread(1, 0x6040, 0x00, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
-		if (result != 0)
-		{
-			printf("Value of the OD entry is %d\n", rdat);
-			return 0;
-		}
-			
-		else printf("SDO read unsucessful\n");
+		/* Note that we can use SDOread/write and therefore ODwrite/read after ec_config_init(FALSE), since init state is sufficient for SDO communication */
+		ODwrite(1, 0X6040, 0X00, 7);
+		uint16 controlWord;
+		controlWord = ODread(1, 0X6040, 0X00);
+
 		
    }
    else
