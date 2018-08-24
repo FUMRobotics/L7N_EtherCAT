@@ -8,8 +8,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <string.h>
-/* The size is a placeholder */
-char IOmap[4096];
+/* Size of IOmap = sum of sizes of RPDOs + TPDOs */
+/* Total size of RPDOs: ControlWord[32 bits] + Interpolation data record sub1[32 bits] = 64 bits
+   Total size of TPDOs: StatusWord[32 bits] + Position actual value[32 bits] = 64 bits
+   Therefore, number of entries of IOmap = 128 bits/8 bits per char = 64 */
+char IOmap[64];
 
 void initialize (char* ifname)
 {
