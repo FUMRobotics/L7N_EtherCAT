@@ -52,7 +52,7 @@ void ODwrite(uint16 slaveNum, uint16 Index, uint8 SubIndex, int16 objectValue)
 		int result;
 		/* Inspird by line 222 to 225 of ebox.c */
 		int objectSize = sizeof(objectValue);
-		result = ec_SDOwrite(slaveNum, Index, subIndex, FALSE, objectSize, objectValue, EC_TIMEOUTRXM);
+		result = ec_SDOwrite(slaveNum, Index, SubIndex, FALSE, objectSize, &objectValue, EC_TIMEOUTRXM);
 		//result = ec_SDOwrite(1,0x6040, 0x00, FALSE, objectSize, &objectValue, EC_TIMEOUTRXM);
 		if (result == 0) 
 			printf("SDO write unsucessful\n");
@@ -66,7 +66,7 @@ uint16 ODread(uint16 slaveNum, uint16 Index, uint8 SubIndex)
 		uint16 rdat;
 		/* rdat = read data, rdl = read data length (read as past sentence of read)*/
 		int rdl = sizeof(rdat); rdat = 0;
-		result = ec_SDOread(slaveNum, Index, subIndex, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
+		result = ec_SDOread(slaveNum, Index, SubIndex, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
 		if (result != 0)
 		{
 			printf("Value of the OD entry is %d\n", rdat);
@@ -101,8 +101,8 @@ int main(int argc, char *argv[])
         
 		/* Note that we can use SDOread/write and therefore ODwrite/read after ec_config_init(FALSE), since init state is sufficient for SDO communication */
 		ODwrite(1, 0X6040, 0X00, 7);
-		uint16 controlWord;
-		controlWord = ODread(1, 0X6040, 0X00);
+		//uint16 controlWord;
+		//controlWord = ODread(1, 0X6040, 0X00);
 
 		
    }
