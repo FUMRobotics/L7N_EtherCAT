@@ -46,7 +46,7 @@ void initialize (char* ifname)
 	}
 }
 
-void ODwrite(uint16 slaveNum, uint16 Index, uint8 SubIndex, int16 objectValue)
+void ODwrite(uint16 slaveNum, uint16 Index, uint8 SubIndex, int32 objectValue)
 {
 		/* For checking whether SDO write is successful */
 		int result;
@@ -58,7 +58,7 @@ void ODwrite(uint16 slaveNum, uint16 Index, uint8 SubIndex, int16 objectValue)
 			printf("SDO write unsucessful\n");
 }
 
-uint16 ODread(uint16 slaveNum, uint16 Index, uint8 SubIndex)
+int32 ODread(uint16 slaveNum, uint16 Index, uint8 SubIndex)
 {
 		/* For checking whether SDO write is successful */
 		int result;
