@@ -36,6 +36,7 @@ void initialize (char* ifname)
 				   enable syncmanagers 2 & 3, which are associated with TPDO and RPDOs 
 				   respectively (p.26 of EtherCAT slave implementation guide). For more info,
 				   refer to SOEM issue #198 */
+				/* For some reason, setting the enable bit puts the drive in SAFE_OP mode */
 				ec_slave[1].SM[2].SMflags |= EC_SMENABLEMASK;
 				ec_slave[1].SM[3].SMflags |= EC_SMENABLEMASK;
 
