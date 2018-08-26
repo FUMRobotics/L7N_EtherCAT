@@ -9,10 +9,10 @@
 #include <string.h>
 #include <string.h>
 /* Size of IOmap = sum of sizes of RPDOs + TPDOs */
-/* Total size of RPDOs: ControlWord[32 bits] + Interpolation data record sub1[32 bits] = 64 bits
-   Total size of TPDOs: StatusWord[32 bits] + Position actual value[32 bits] = 64 bits
-   Therefore, number of entries of IOmap = 128 bits/8 bits per char = 64 */
-char IOmap[64];
+/* Total size of RPDOs: ControlWord[16 bits] + Interpolation data record sub1[32 bits] = 48 bits
+   Total size of TPDOs: StatusWord[16 bits] + Position actual value[32 bits] = 48 bits
+   Therefore, number of entries of IOmap = 96 bits/8 bits per char = 12 */
+char IOmap[12];
 
 void initialize (char* ifname)
 {
