@@ -81,6 +81,24 @@ int32 ODread(uint16 slaveNum, uint16 Index, uint8 SubIndex)
 		}
 }
 
+void storeAllParams(uint16 slaveNum)
+{
+	// See page 66 of EPOS3 EtherCAT application notes, or page 85 of EPOS4's
+	ODwrite(slaveNum, 0x01010, 0x00, 0x65766173);
+	
+}
+
+void restoreDefParams(uint16 slaveNum)
+{
+	
+	// See page 66 of EPOS3 EtherCAT application notes, or page 85 of EPOS4's
+	ODwrite(slaveNum, 0x01011, 0x00, 0x64616F6C);
+	
+}
+
+
+
+
 int main(int argc, char *argv[])
 {
 	
