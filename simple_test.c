@@ -84,7 +84,7 @@ int32 ODread(uint16 slaveNum, uint16 Index, uint8 SubIndex)
 void storeAllParams(uint16 slaveNum)
 {
 	/* Stores all current OD entries to EEPROM so they're not lost after restarting the drive */
-	/* See page 66 of EPOS3 EtherCAT application notes, or page 85 of EPOS4's */
+	/* See page 66 of EPOS3 EtherCAT application notes, or page 85 of EPOS4s */
 	ODwrite(slaveNum, 0x01010, 0x00, 0x65766173);
 	
 }
@@ -92,18 +92,35 @@ void storeAllParams(uint16 slaveNum)
 void restoreDefParams(uint16 slaveNum)
 {
 	/* Sets all parametrs to default value */
-	/* See page 66 of EPOS3 EtherCAT application notes, or page 85 of EPOS4's */
+	/* See page 66 of EPOS3 EtherCAT application notes, or page 85 of EPOS4s */
 	ODwrite(slaveNum, 0x01011, 0x00, 0x64616F6C);
 	
 }
 
 void switchOn_enableOp(uint16 slaveNum)
 {
+	/* Set bits 0,1,2 and 3 of ControlWord to 1. */
 	/* See page 68 of the Mecapion manual, "State Machine Control Commands" */
 	ODwrite(slaveNum, 0x6040, 0x00, 15);
 	
 }
 
+void faultReset(uint16 slaveNum)
+{
+	
+	/* Set bit 7 of ControlWord to 1. */
+	/* See page 68 of the Mecapion manual, "State Machine Control Commands" */
+	ODwrite(slaveNum, 0x6040, 0x00, 128);
+	
+}
+
+void setModeCSP(uint16 slaveNum)
+{
+	
+		/* Set index 0x6060, to 8 for cyclic synchronous position mode */
+		/* See page 174 of the manual */
+		ODwrite(slaveNum, 0x6060, 0x00, 8);
+}
 
 int main(int argc, char *argv[])
 {
