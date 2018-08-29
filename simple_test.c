@@ -83,20 +83,26 @@ int32 ODread(uint16 slaveNum, uint16 Index, uint8 SubIndex)
 
 void storeAllParams(uint16 slaveNum)
 {
-	// See page 66 of EPOS3 EtherCAT application notes, or page 85 of EPOS4's
+	/* Stores all current OD entries to EEPROM so they're not lost after restarting the drive */
+	/* See page 66 of EPOS3 EtherCAT application notes, or page 85 of EPOS4's */
 	ODwrite(slaveNum, 0x01010, 0x00, 0x65766173);
 	
 }
 
 void restoreDefParams(uint16 slaveNum)
 {
-	
-	// See page 66 of EPOS3 EtherCAT application notes, or page 85 of EPOS4's
+	/* Sets all parametrs to default value */
+	/* See page 66 of EPOS3 EtherCAT application notes, or page 85 of EPOS4's */
 	ODwrite(slaveNum, 0x01011, 0x00, 0x64616F6C);
 	
 }
 
-
+void switchOn_enableOp(uint16 slaveNum)
+{
+	/* See page 68 of the Mecapion manual, "State Machine Control Commands" */
+	ODwrite(slaveNum, 0x6040, 0x00, 15);
+	
+}
 
 
 int main(int argc, char *argv[])
@@ -131,6 +137,6 @@ int main(int argc, char *argv[])
    }
 
    printf("End program\n");
-   return (0);
+   return 0;
    
 }
