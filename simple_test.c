@@ -138,6 +138,22 @@ int main(int argc, char *argv[])
 		if (ec_statecheck(1, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE) == EC_STATE_SAFE_OP)
 			printf("Slave 1 reached SAFE_OP state\n");
 		
+			/* Request operational state */
+			/* See line 295 of rtk/main.c */
+		    /*rprintp("Request operational state for all slaves\n");
+            ec_slave[0].state = EC_STATE_OPERATIONAL;
+            /* send one valid process data to make outputs in slaves happy*/
+           /* ec_send_processdata();
+            ec_receive_processdata(EC_TIMEOUTRET); 
+            /* request OP state for all slaves */
+         /*   ec_writestate(0);
+            /* wait for all slaves to reach OP state */
+           /* ec_statecheck(0, EC_STATE_OPERATIONAL,  EC_TIMEOUTSTATE);
+            if (ec_slave[0].state == EC_STATE_OPERATIONAL )
+            {
+               rprintp("Operational state reached for all slaves.\n");
+            }
+		
 		/* Line 122 of the original simple_test */
 		printf("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", 1, ec_slave[1].state, ec_slave[1].ALstatuscode, ec_ALstatuscode2string(ec_slave[1].ALstatuscode));
         
