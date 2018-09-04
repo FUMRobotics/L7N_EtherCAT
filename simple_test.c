@@ -14,7 +14,7 @@
    Therefore, number of entries of IOmap = 96 bits/8 bits per char = 12 */
 char IOmap[12];
 
-void initialize (char* ifname)
+void initialize (char* ifname, uint16 slaveNum)
 {
 /* See https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */	
 
@@ -29,7 +29,7 @@ void initialize (char* ifname)
 				/* Passing 0 for the first argument means check All slaves */
 				/* ec_statecheck returns the value of the state, as defiend in ethercattypes.h (i.e. 4 for safe-op). 
 		           In case the fisrt argument is 0, it returns the value of the lowest state among all the slaves */
-				if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
+				if (ec_statecheck(slaveNum, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
 					printf("All slaves reached PRE_OP state\n");
 				
 				/* Due to a bug in EtherCAT implementation by Mecapion, we have to manually
@@ -37,8 +37,8 @@ void initialize (char* ifname)
 				   respectively (p.26 of EtherCAT slave implementation guide). For more info,
 				   refer to SOEM issue #198 */
 				/* For some reason, setting the enable bit puts the drive in SAFE_OP mode */
-				ec_slave[1].SM[2].SMflags |= EC_SMENABLEMASK;
-				ec_slave[1].SM[3].SMflags |= EC_SMENABLEMASK;
+				ec_slave[slaveNum].SM[2].SMflags |= 0x00010000;
+				ec_slave[slaveNum].SM[3].SMflags |= 0x00010000;
 
 				/* To do: - Run slaveinfo and this code without ec_config_map(&IOmap)
                           - Find out what ec_config_map does */
@@ -122,6 +122,23 @@ void setModeCSP(uint16 slaveNum)
 		ODwrite(slaveNum, 0x6060, 0x00, 8);
 }
 
+void stateSafeOP(uint16 slaveNum)
+{
+	
+		ec_slave[slaveNum].state = EC_STATE_SAFE_OP;
+		ec_writestate(slaveNum);
+		
+		if (ec_statecheck(slaveNum, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE) == EC_STATE_SAFE_OP)
+		{
+			if (slaveNum == 0 )
+				printf("All slaves reached SAFE_OP state\n");
+			else
+				printf("Slave %d reached SAFE_OP state\n", slaveNum);
+		}
+	
+}
+
+
 int main(int argc, char *argv[])
 {
 	
@@ -129,14 +146,11 @@ int main(int argc, char *argv[])
 
    if (argc > 1)
    {
-		initialize(argv[1]);
+		initialize(argv[1], 1);
 		
 		/* Specify the desired state for the slave and then write it */
-		ec_slave[1].state = EC_STATE_SAFE_OP;
-		ec_writestate(1);
 		
-		if (ec_statecheck(1, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE) == EC_STATE_SAFE_OP)
-			printf("Slave 1 reached SAFE_OP state\n");
+
 		
 			/* Request operational state */
 			/* See line 295 of rtk/main.c */
