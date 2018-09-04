@@ -178,6 +178,9 @@ int main(int argc, char *argv[])
 		drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
 		drive_TPDO = (drive_TPDO_t*) ec_slave[1].inputs;
 		
+		setModeCSP(1);
+		switchOn_enableOp(1);
+		
 		/* Request operational state */
 		/* See line 295 of rtk/main.c */
 		/*rprintp("Request operational state for all slaves\n");
