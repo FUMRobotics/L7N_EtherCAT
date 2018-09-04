@@ -15,6 +15,7 @@
    Therefore, number of entries of IOmap = 96 bits/8 bits per char = 12 */
 char IOmap[12];
 
+/* For defining PDOs see issue #177 of SOEM github */
 typedef struct PACKED
 {
    uint16 value_6040;
