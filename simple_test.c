@@ -124,7 +124,7 @@ void setModeCSP(uint16 slaveNum)
 
 void stateSafeOP(uint16 slaveNum)
 {
-	
+		/* Specify the desired state for the slave and then write it */
 		ec_slave[slaveNum].state = EC_STATE_SAFE_OP;
 		ec_writestate(slaveNum);
 		
@@ -148,9 +148,6 @@ int main(int argc, char *argv[])
    {
 		initialize(argv[1], 1);
 		
-		/* Specify the desired state for the slave and then write it */
-		
-
 		
 			/* Request operational state */
 			/* See line 295 of rtk/main.c */
@@ -172,7 +169,7 @@ int main(int argc, char *argv[])
 		printf("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", 1, ec_slave[1].state, ec_slave[1].ALstatuscode, ec_ALstatuscode2string(ec_slave[1].ALstatuscode));
         
 		/* Note that we can use SDOread/write and therefore ODwrite/read after ec_config_init(FALSE), since init state is sufficient for SDO communication */
-		ODwrite(1, 0X6040, 0X00, 7);
+		//ODwrite(1, 0X6040, 0X00, 7);
 		//uint16 controlWord;
 		//controlWord = ODread(1, 0X6040, 0X00);
 
