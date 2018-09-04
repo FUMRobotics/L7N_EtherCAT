@@ -141,6 +141,7 @@ void stateSafeOP(uint16 slaveNum)
 
 void readState(uint16 slaveNum)
 {
+	/* Without this pause, SOEM will not detect an alarm */
 	usleep(EC_TIMEOUTRXM);
 	/* Line 122 of the original simple_test */
 	ec_readstate();
