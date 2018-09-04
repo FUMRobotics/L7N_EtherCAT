@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <string.h>
+#include <unistd.h>
 /* Size of IOmap = sum of sizes of RPDOs + TPDOs */
 /* Total size of RPDOs: ControlWord[16 bits] + Interpolation data record sub1[32 bits] = 48 bits
    Total size of TPDOs: StatusWord[16 bits] + Position actual value[32 bits] = 48 bits
@@ -49,36 +50,36 @@ void initialize (char* ifname, uint16 slaveNum)
 
 void ODwrite(uint16 slaveNum, uint16 Index, uint8 SubIndex, int32 objectValue)
 {
-		/* For checking whether SDO write is successful */
-		int result;
-		/* Inspird by line 222 to 225 of ebox.c */
-		int objectSize = sizeof(objectValue);
-		result = ec_SDOwrite(slaveNum, Index, SubIndex, FALSE, objectSize, &objectValue, EC_TIMEOUTRXM);
-		//result = ec_SDOwrite(1,0x6040, 0x00, FALSE, objectSize, &objectValue, EC_TIMEOUTRXM);
-		if (result == 0) 
-			printf("SDO write unsucessful\n");
+	/* For checking whether SDO write is successful */
+	int result;
+	/* Inspird by line 222 to 225 of ebox.c */
+	int objectSize = sizeof(objectValue);
+	result = ec_SDOwrite(slaveNum, Index, SubIndex, FALSE, objectSize, &objectValue, EC_TIMEOUTRXM);
+	//result = ec_SDOwrite(1,0x6040, 0x00, FALSE, objectSize, &objectValue, EC_TIMEOUTRXM);
+	if (result == 0) 
+		printf("SDO write unsucessful\n");
 }
 
 int32 ODread(uint16 slaveNum, uint16 Index, uint8 SubIndex)
 {
-		/* For checking whether SDO write is successful */
-		int result;
-		/* Inspired by lines 211 to 221 of slaveinfo.c */
-		uint16 rdat;
-		/* rdat = read data, rdl = read data length (read as past sentence of read)*/
-		int rdl = sizeof(rdat); rdat = 0;
-		result = ec_SDOread(slaveNum, Index, SubIndex, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
-		if (result != 0)
-		{
-			printf("Value of the OD entry is %d\n", rdat);
-			return rdat;
-		}
+	/* For checking whether SDO write is successful */
+	int result;
+	/* Inspired by lines 211 to 221 of slaveinfo.c */
+	uint16 rdat;
+	/* rdat = read data, rdl = read data length (read as past sentence of read)*/
+	int rdl = sizeof(rdat); rdat = 0;
+	result = ec_SDOread(slaveNum, Index, SubIndex, FALSE, &rdl, &rdat, EC_TIMEOUTRXM);
+	if (result != 0)
+	{
+		printf("Value of the OD entry is %d\n", rdat);
+		return rdat;
+	}
 			
-		else 
-		{	
-			printf("SDO read unsucessful\n");
-			return 0;
-		}
+	else 
+	{	
+		printf("SDO read unsucessful\n");
+		return 0;
+	}
 }
 
 void storeAllParams(uint16 slaveNum)
@@ -117,25 +118,33 @@ void faultReset(uint16 slaveNum)
 void setModeCSP(uint16 slaveNum)
 {
 	
-		/* Set index 0x6060, to 8 for cyclic synchronous position mode */
-		/* See page 174 of the manual */
-		ODwrite(slaveNum, 0x6060, 0x00, 8);
+	/* Set index 0x6060, to 8 for cyclic synchronous position mode */
+	/* See page 174 of the manual */
+	ODwrite(slaveNum, 0x6060, 0x00, 8);
 }
 
 void stateSafeOP(uint16 slaveNum)
 {
-		/* Specify the desired state for the slave and then write it */
-		ec_slave[slaveNum].state = EC_STATE_SAFE_OP;
-		ec_writestate(slaveNum);
+	/* Specify the desired state for the slave and then write it */
+	ec_slave[slaveNum].state = EC_STATE_SAFE_OP;
+	ec_writestate(slaveNum);
 		
-		if (ec_statecheck(slaveNum, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE) == EC_STATE_SAFE_OP)
-		{
-			if (slaveNum == 0 )
-				printf("All slaves reached SAFE_OP state\n");
-			else
-				printf("Slave %d reached SAFE_OP state\n", slaveNum);
-		}
+	if (ec_statecheck(slaveNum, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE) == EC_STATE_SAFE_OP)
+	{
+		if (slaveNum == 0 )
+			printf("All slaves reached SAFE_OP state\n");
+		else
+			printf("Slave %d reached SAFE_OP state\n", slaveNum);
+	}
 	
+}
+
+void readState(uint16 slaveNum)
+{
+	usleep(EC_TIMEOUTRXM);
+	/* Line 122 of the original simple_test */
+	ec_readstate();
+	printf("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", slaveNum, ec_slave[slaveNum].state, ec_slave[slaveNum].ALstatuscode, ec_ALstatuscode2string(ec_slave[slaveNum].ALstatuscode));
 }
 
 
@@ -165,8 +174,6 @@ int main(int argc, char *argv[])
                rprintp("Operational state reached for all slaves.\n");
             }
 		
-		/* Line 122 of the original simple_test */
-		printf("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", 1, ec_slave[1].state, ec_slave[1].ALstatuscode, ec_ALstatuscode2string(ec_slave[1].ALstatuscode));
         
 		/* Note that we can use SDOread/write and therefore ODwrite/read after ec_config_init(FALSE), since init state is sufficient for SDO communication */
 		//ODwrite(1, 0X6040, 0X00, 7);
