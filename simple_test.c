@@ -15,6 +15,18 @@
    Therefore, number of entries of IOmap = 96 bits/8 bits per char = 12 */
 char IOmap[12];
 
+typedef struct PACKED
+{
+   uint16 value_6040;
+   int32 value_607A;
+} drive_RPDO;
+
+typedef struct PACKED
+{
+   uint16 value_6041;
+   int32 value_6064;
+} drive_TPDO;
+
 void initialize (char* ifname, uint16 slaveNum)
 {
 /* See https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */	
