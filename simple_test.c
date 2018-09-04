@@ -133,7 +133,7 @@ void faultReset(uint16 slaveNum)
 void setModeCSP(uint16 slaveNum)
 {
 	
-	/* Set index 0x6060, to 8 for cyclic synchronous position mode */
+	/* Set index 0x6060 to 8 for cyclic synchronous position mode */
 	/* See page 174 of the manual */
 	ODwrite(slaveNum, 0x6060, 0x00, 8);
 }
@@ -174,6 +174,7 @@ int main(int argc, char *argv[])
 		initialize(argv[1], 1);
 		
 		/* According to issue #177, we first create a structure and then map it to ec_slave[1].inputs/outputs */
+		/* Here we're defiing drive_RPDO as a pointer to drive_RPDO_t, and assign the value equal to ec_slave[1].outputs */
 		drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
 		drive_TPDO = (drive_TPDO_t*) ec_slave[1].inputs;
 		
