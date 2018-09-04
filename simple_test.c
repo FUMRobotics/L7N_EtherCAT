@@ -63,6 +63,7 @@ void initialize (char* ifname, uint16 slaveNum)
 
 void ODwrite(uint16 slaveNum, uint16 Index, uint8 SubIndex, int32 objectValue)
 {
+	/* Note that we can use SDOread/write and therefore ODwrite/read after ec_config_init(FALSE), since init state is sufficient for SDO communication */
 	/* For checking whether SDO write is successful */
 	int result;
 	/* Inspird by line 222 to 225 of ebox.c */
@@ -77,6 +78,7 @@ int32 ODread(uint16 slaveNum, uint16 Index, uint8 SubIndex)
 {
 	/* Usage : int val = ODread(1, 0x6040, 0x00);
 			   printf("%d", val);
+	/* Note that we can use SDOread/write and therefore ODread/write after ec_config_init(FALSE), since init state is sufficient for SDO communication */
 	/* For checking whether SDO write is successful */
 	int result;
 	/* Inspired by lines 211 to 221 of slaveinfo.c */
@@ -178,14 +180,25 @@ int main(int argc, char *argv[])
 		drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
 		drive_TPDO = (drive_TPDO_t*) ec_slave[1].inputs;
 		
+		// drive_RPDO -> value_6040 = 15;
+		
+		
 		setModeCSP(1);
 		switchOn_enableOp(1);
+		
+		
+		
+		//ec_receive_processdata(EC_TIMEOUTRET);
+		//int statusWord = drive_TPDO -> value_6041; ??
+		//printf("%d", statusWord);
+		
+		
 		
 		/* Request operational state */
 		/* See line 295 of rtk/main.c */
 		/*rprintp("Request operational state for all slaves\n");
         ec_slave[0].state = EC_STATE_OPERATIONAL; */
-        /* send one valid process data to make outputs in slaves happy*/
+        /* send one valid process data to make outputs in slaves happy */
         /* ec_send_processdata();
         ec_receive_processdata(EC_TIMEOUTRET); 
         request OP state for all slaves */
@@ -196,15 +209,6 @@ int main(int argc, char *argv[])
         {
 			rprintp("Operational state reached for all slaves.\n");
         }*/
-		
-        
-		/* Note that we can use SDOread/write and therefore ODwrite/read after ec_config_init(FALSE), since init state is sufficient for SDO communication */
-		//ODwrite(1, 0X6040, 0X00, 7);
-		//uint16 controlWord;
-		//controlWord = ODread(1, 0X6040, 0X00);
-		
-		
-
 		
    }
    else
