@@ -20,13 +20,13 @@ typedef struct PACKED
 {
    uint16 value_6040;
    int32 value_607A;
-} drive_RPDO;
+} drive_RPDO_t;
 
 typedef struct PACKED
 {
    uint16 value_6041;
    int32 value_6064;
-} drive_TPDO;
+} drive_TPDO_t;
 
 void initialize (char* ifname, uint16 slaveNum)
 {
@@ -75,6 +75,8 @@ void ODwrite(uint16 slaveNum, uint16 Index, uint8 SubIndex, int32 objectValue)
 
 int32 ODread(uint16 slaveNum, uint16 Index, uint8 SubIndex)
 {
+	/* Usage : int val = ODread(1, 0x6040, 0x00);
+			   printf("%d", val);
 	/* For checking whether SDO write is successful */
 	int result;
 	/* Inspired by lines 211 to 221 of slaveinfo.c */
@@ -171,28 +173,33 @@ int main(int argc, char *argv[])
    {
 		initialize(argv[1], 1);
 		
+		/* According to issue #177, we first create a structure and then map it to ec_slave[1].inputs/outputs */
+		drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
+		drive_TPDO = (drive_TPDO_t*) ec_slave[1].inputs;
 		
-			/* Request operational state */
-			/* See line 295 of rtk/main.c */
-		    /*rprintp("Request operational state for all slaves\n");
-            ec_slave[0].state = EC_STATE_OPERATIONAL;
-            /* send one valid process data to make outputs in slaves happy*/
-           /* ec_send_processdata();
-            ec_receive_processdata(EC_TIMEOUTRET); 
-            /* request OP state for all slaves */
-         /*   ec_writestate(0);
-            /* wait for all slaves to reach OP state */
-           /* ec_statecheck(0, EC_STATE_OPERATIONAL,  EC_TIMEOUTSTATE);
-            if (ec_slave[0].state == EC_STATE_OPERATIONAL )
-            {
-               rprintp("Operational state reached for all slaves.\n");
-            }
+		/* Request operational state */
+		/* See line 295 of rtk/main.c */
+		/*rprintp("Request operational state for all slaves\n");
+        ec_slave[0].state = EC_STATE_OPERATIONAL; */
+        /* send one valid process data to make outputs in slaves happy*/
+        /* ec_send_processdata();
+        ec_receive_processdata(EC_TIMEOUTRET); 
+        request OP state for all slaves */
+        /*ec_writestate(0);
+        wait for all slaves to reach OP state */
+        /*ec_statecheck(0, EC_STATE_OPERATIONAL,  EC_TIMEOUTSTATE);
+        if (ec_slave[0].state == EC_STATE_OPERATIONAL )
+        {
+			rprintp("Operational state reached for all slaves.\n");
+        }*/
 		
         
 		/* Note that we can use SDOread/write and therefore ODwrite/read after ec_config_init(FALSE), since init state is sufficient for SDO communication */
 		//ODwrite(1, 0X6040, 0X00, 7);
 		//uint16 controlWord;
 		//controlWord = ODread(1, 0X6040, 0X00);
+		
+		
 
 		
    }
