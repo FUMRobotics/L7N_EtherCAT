@@ -15,7 +15,7 @@
    Therefore, number of entries of IOmap = 96 bits/8 bits per char = 12 */
 char IOmap[12];
 
-/* For defining PDOs see issue #177 of SOEM github */
+/* For defining PDOs see issue #177 of SOEM's github and line 216 of tutorial.txt */
 typedef struct PACKED
 {
    uint16 value_6040;
@@ -184,10 +184,8 @@ int main(int argc, char *argv[])
 		
 		// drive_RPDO -> value_6040 = 15;
 		
-		
 		setModeCSP(1);
 		switchOn_enableOp(1);
-		
 		
 		
 		//ec_receive_processdata(EC_TIMEOUTRET);
