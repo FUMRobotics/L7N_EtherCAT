@@ -21,12 +21,14 @@ typedef struct PACKED
    uint16 value_6040;
    int32 value_607A;
 } drive_RPDO_t;
+drive_RPDO_t* drive_RPDO;
 
 typedef struct PACKED
 {
    uint16 value_6041;
    int32 value_6064;
 } drive_TPDO_t;
+drive_TPDO_t* drive_TPDO;
 
 void initialize (char* ifname, uint16 slaveNum)
 {
