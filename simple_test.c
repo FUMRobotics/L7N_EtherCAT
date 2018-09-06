@@ -57,9 +57,14 @@ void initialize (char* ifname, uint16 slaveNum)
 				ec_slave[slaveNum].SM[2].SMflags |= 0x00010000;
 				ec_slave[slaveNum].SM[3].SMflags |= 0x00010000;
 
+				/* We need to this this just once, while we might run initialize for multiple slave */
+				if (slaveNum == 1)
+				{
 				/* To do: - Run slaveinfo and this code without ec_config_map(&IOmap)
                           - Find out what ec_config_map does */
  				ec_config_map(&IOmap);
+				ec_configdc();
+				}
 		}
 	}
 }
