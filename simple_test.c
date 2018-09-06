@@ -7,7 +7,6 @@
 #include "ethercat.h"
 #include <stdio.h>
 #include <string.h>
-#include <string.h>
 #include <unistd.h>
 /* Size of IOmap = sum of sizes of RPDOs + TPDOs */
 /* Total size of RPDOs: ControlWord[16 bits] + Interpolation data record sub1[32 bits] = 48 bits
