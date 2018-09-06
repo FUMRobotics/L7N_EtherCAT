@@ -177,45 +177,89 @@ int main(int argc, char *argv[])
    if (argc > 1)
    {
 		initialize(argv[1], 1);
-		
+		readState(1);
+		/* Total size of slave 1 TPDOs, in bytes */
+		slave_1_TPDO_size = ec_slave[1].Ibytes;
+		int i, j, chk;
 		/* According to issue #177, we first create a structure and then map it to ec_slave[1].inputs/outputs */
 		/* Here we define drive_RPDO as a pointer to drive_RPDO_t, and assign it a value equal to ec_slave[1].outputs */
-		drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
-		drive_TPDO = (drive_TPDO_t*) ec_slave[1].inputs;
+		/* drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
+		drive_TPDO = (drive_TPDO_t*) ec_slave[1].inputs; */
 		
-		// drive_RPDO -> value_6040 = 15;
-		
-		setModeCSP(1);
-		switchOn_enableOp(1);
-		
-		
-		//ec_receive_processdata(EC_TIMEOUTRET);
-		//int statusWord = drive_TPDO -> value_6041; ??
-		//printf("%d", statusWord);
-		
-		
-		
-		/* Request operational state */
-		/* See line 295 of rtk/main.c */
-		/*rprintp("Request operational state for all slaves\n");
-        ec_slave[0].state = EC_STATE_OPERATIONAL; */
-        /* send one valid process data to make outputs in slaves happy */
-        /* ec_send_processdata();
-        ec_receive_processdata(EC_TIMEOUTRET); 
-        request OP state for all slaves */
-        /*ec_writestate(0);
-        wait for all slaves to reach OP state */
-        /*ec_statecheck(0, EC_STATE_OPERATIONAL,  EC_TIMEOUTSTATE);
+		ec_slave[0].state = EC_STATE_OPERATIONAL;
+        /* send one valid process data to make outputs in slaves happy*/
+        ec_send_processdata();
+        ec_receive_processdata(EC_TIMEOUTRET);
+        /* request OP state for all slaves */
+        ec_writestate(0);
+		/* According to ETG_Diagnostics_with_EtherCAT document, each successful write to the slave's memory (RPDO, outputs in SOEM)
+		   increases the WKC by 2 and sucessful read (TPDO, inputs in SOEM) increments it by 1. */
+		expectedWKC = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
+        chk = 40;
+        /* wait for all slaves to reach OP state */
+        do
+        {
+            ec_send_processdata();
+            ec_receive_processdata(EC_TIMEOUTRET);
+            ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
+        }
+        while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
         if (ec_slave[0].state == EC_STATE_OPERATIONAL )
         {
-			rprintp("Operational state reached for all slaves.\n");
-        }*/
+			printf("Operational state reached for all slaves.\n");
+			for(i = 1; i <= 10000; i++)
+			{
+				
+				ec_send_processdata();
+				wkc = ec_receive_processdata(EC_TIMEOUTRET);
+					
+					/* If RPDOs were sucessfully written to the slave and TPDO were read */
+					if(wkc >= expectedWKC)
+					{
+						
+						/* Write every byte of TPDOs of slave 1 in one line */
+						for(j = 0 ; j < slave_1_TPDO_size; j++)
+						{
+							/* ec_slave[1].inputs is a pointer to the first byte of slave 1 TPDOs.
+							   Therefore, each time we increment the address and then dereference it to write that byte */
+							/* Suppose that the printed line is 
+							   21 02 a9 5a 46 05
+							   and we have status word (0x6041) and position actual value (0x6064) as TPDOs of slave 1.
+							   Thus, 
+							   0x6041 = 0x0546
+							   0x6064 = 0x5AA90221
+							*/
+							printf(" %2.2x", *(ec_slave[1].inputs + j));
+						}
+						/* Move the active position to the beginning of the line, so that the next line is overwritten on
+						   the current one */
+						printf("\r");
+					}
+					
+				/* Sleep for 5 milliseconds */	
+				osal_usleep(5000);
+			}
 		
-   }
-   else
-   {
-      printf("Usage: simple_test ifname1\nifname = eth0 for example\n");
-   }
+		
+		}
+		else
+		{
+			printf("Not all slaves reached operational state.\n");
+			ec_readstate();
+			
+			for(i = 1; i<=ec_slavecount ; i++)
+				readState(i);
+		}
+		
+		printf("\nRequest init state for all slaves\n");
+        ec_slave[0].state = EC_STATE_INIT;
+		/* request INIT state for all slaves */
+        ec_writestate(0);
+		
+	else
+	{
+		printf("Usage: simple_test ifname1\nifname = eth0 for example\n");
+    }
 
    printf("End program\n");
    return 0;
