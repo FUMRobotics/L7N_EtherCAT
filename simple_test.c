@@ -1,7 +1,7 @@
 /*
+ * See https://github.com/OpenEtherCATsociety/SOEM/blob/master/test/linux/simple_test/simple_test.c
  * Usage : simple_test [ifname1]
  * ifname is NIC interface, f.e. eth0
- *
  */
  
 #include "ethercat.h"
