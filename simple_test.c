@@ -172,9 +172,20 @@ void stateRequest(uint16 slaveNum, uint8 reqState)
 	}
 				
 	ec_slave[slaveNum].state = reqState;
+	
+	/* Special procedure for operational state. See simple_test.c */
+	if (reqState == 8)
+	{
+		/* send one valid process data to make outputs in slaves happy*/
+		ec_send_processdata();
+        ec_receive_processdata(EC_TIMEOUTRET);
+		ec_writestate(slaveNum);
+		return;
+	}
+	
 	ec_writestate(slaveNum);
 		
-	if (ec_statecheck(slaveNum, Reqstate, EC_TIMEOUTSTATE) == reqState)
+	if (ec_statecheck(slaveNum, reqState, EC_TIMEOUTSTATE) == reqState)
 	{
 		if (slaveNum == 0 )
 			printf("All slaves reached %s state\n", state);
@@ -206,30 +217,32 @@ int main(int argc, char *argv[])
 		initialize(argv[1], 1);
 		readState(1);
 		/* Total size of slave 1 TPDOs, in bytes */
-		slave_1_TPDO_size = ec_slave[1].Ibytes;
+		int slave_1_TPDO_size = ec_slave[1].Ibytes;
 		int i, j, chk;
 		/* According to issue #177, we first create a structure and then map it to ec_slave[1].inputs/outputs */
 		/* Here we define drive_RPDO as a pointer to drive_RPDO_t, and assign it a value equal to ec_slave[1].outputs */
 		/* drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
 		drive_TPDO = (drive_TPDO_t*) ec_slave[1].inputs; */
 		
-		ec_slave[0].state = EC_STATE_OPERATIONAL;
+		//ec_slave[0].state = EC_STATE_OPERATIONAL;
         /* send one valid process data to make outputs in slaves happy*/
-        ec_send_processdata();
-        ec_receive_processdata(EC_TIMEOUTRET);
+        //ec_send_processdata();
+        //ec_receive_processdata(EC_TIMEOUTRET);
         /* request OP state for all slaves */
-        ec_writestate(0);
+        //ec_writestate(0);
+		stateRequest(0, EC_STATE_OPERATIONAL);
 		/* According to ETG_Diagnostics_with_EtherCAT document, each successful write to the slave's memory (RPDO, outputs in SOEM)
 		   increases the WKC by 2 and sucessful read (TPDO, inputs in SOEM) increments it by 1. */
 		expectedWKC = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
         chk = 40;
-        /* wait for all slaves to reach OP state */
-		/* Note: After the drive has entered OP state, we need to continuously send process data, usually at 100 ms intervals.
-		   Otherwise, the drive will give Alarm 67. See EtherCAT error 0x001B. */
+        /* Wait for all slaves to reach OP state */
+		/* The reason behind using this while loop: After the drive has entered OP state, we need to repeatedly send process data, at least every 100 ms.
+		   Otherwise, the Alarm 67 will be given by the drive. See EtherCAT error 0x001B. */
         do
         {
             ec_send_processdata();
             ec_receive_processdata(EC_TIMEOUTRET);
+			/* EC_TIMEOUTSTATE is defined to be 2 seconds but as pointed out in comments above, we can't wait that long (drive shoud receive a frame every 100 ms) */
             ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
         }
         while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
@@ -283,9 +296,10 @@ int main(int argc, char *argv[])
 		}
 		
 		printf("\nRequest init state for all slaves\n");
-        ec_slave[0].state = EC_STATE_INIT;
+        //ec_slave[0].state = EC_STATE_INIT;
 		/* request INIT state for all slaves */
-        ec_writestate(0);
+        //ec_writestate(0);
+		stateRequest(0, EC_STATE_INIT);
 		
 	else
 	{
