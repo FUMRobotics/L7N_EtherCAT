@@ -57,7 +57,7 @@ void initialize (char* ifname, uint16 slaveNum)
 				ec_slave[slaveNum].SM[2].SMflags |= 0x00010000;
 				ec_slave[slaveNum].SM[3].SMflags |= 0x00010000;
 
-				/* We need to this this just once, while we might run initialize for multiple slave */
+				/* We need to this just once, while we might run initialize for multiple slaves */
 				if (slaveNum == 1)
 				{
 				/* To do: - Run slaveinfo and this code without ec_config_map(&IOmap)
@@ -148,19 +148,41 @@ void setModeCSP(uint16 slaveNum)
 	ODwrite(slaveNum, 0x6060, 0x00, 8);
 }
 
-void stateSafeOP(uint16 slaveNum)
+void stateRequest(uint16 slaveNum, uint8 reqState)
 {
+	
 	/* Specify the desired state for the slave and then write it */
-	ec_slave[slaveNum].state = EC_STATE_SAFE_OP;
+	switch (reqState)
+	{
+		case 1:
+			char state[] = "init";
+			break;
+		case 2:
+			char state[] = "pre-op";
+			break;
+		case 4:
+			char state[] = "safe-op";
+			break;
+		case 8:
+			char state[] = "op";
+			break;
+		default:
+			printf("Requested state is not valid\n");
+			return;
+	}
+				
+	ec_slave[slaveNum].state = reqState;
 	ec_writestate(slaveNum);
 		
-	if (ec_statecheck(slaveNum, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE) == EC_STATE_SAFE_OP)
+	if (ec_statecheck(slaveNum, Reqstate, EC_TIMEOUTSTATE) == reqState)
 	{
 		if (slaveNum == 0 )
-			printf("All slaves reached SAFE_OP state\n");
+			printf("All slaves reached %s state\n", state);
 		else
-			printf("Slave %d reached SAFE_OP state\n", slaveNum);
+			printf("Slave %d reached %s state\n", state);
 	}
+	else
+		printf("Not all slaves reached %s state \n", state);
 	
 }
 
