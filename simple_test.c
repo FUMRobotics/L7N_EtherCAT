@@ -220,7 +220,8 @@ int main(int argc, char *argv[])
 				ec_send_processdata();
 				wkc = ec_receive_processdata(EC_TIMEOUTRET);
 					
-					/* If RPDOs were sucessfully written to the slave and TPDO were read */
+					/* If RPDOs were sucessfully written to the slave and TPDO were written to EtherCAT frame. */
+					/* In other words, we check whether a slave couldn't read from/write to the incoming frame */
 					if(wkc >= expectedWKC)
 					{
 						
