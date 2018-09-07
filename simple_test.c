@@ -182,7 +182,7 @@ void stateRequest(uint16 slaveNum, uint8 reqState)
 			printf("Slave %d reached %s state\n", state);
 	}
 	else
-		printf("Not all slaves reached %s state \n", state);
+		printf("Not all slaves reached %s state\n", state);
 	
 }
 
@@ -251,8 +251,8 @@ int main(int argc, char *argv[])
 						for(j = 0 ; j < slave_1_TPDO_size; j++)
 						{
 							/* ec_slave[1].inputs is a pointer to the first byte of slave 1 TPDOs.
-							   Therefore, each time we increment the address and then dereference it to write that byte */
-							/* Suppose that the printed line is 
+							   Therefore, each time we increment the address and then dereference it in order to write that byte */
+							/* Now, suppose the printed line is 
 							   21 02 a9 5a 46 05
 							   and we have status word (0x6041) and position actual value (0x6064) as TPDOs of slave 1.
 							   Thus, 
