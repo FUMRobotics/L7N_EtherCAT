@@ -202,6 +202,8 @@ int main(int argc, char *argv[])
 		expectedWKC = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
         chk = 40;
         /* wait for all slaves to reach OP state */
+		/* Note: After the drive has entered OP state, we need to continuously send process data, usually at 100 ms intervals.
+		   Otherwise, the drive will give Alarm 67. See EtherCAT error 0x001B. */
         do
         {
             ec_send_processdata();
@@ -247,6 +249,7 @@ int main(int argc, char *argv[])
 		
 		
 		}
+		/* If, after running the loop for 40 times, not all slaves have reached OP state, */
 		else
 		{
 			printf("Not all slaves reached operational state.\n");
