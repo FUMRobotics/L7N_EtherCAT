@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
 		setModeCSP(1);
 		/* Total size of slave 1 TPDOs, in bytes */
 		int slave_1_TPDO_size = ec_slave[1].Ibytes;
-		int i, j, chk;
+		int i, j, chk, actualPos;
 		/* According to issue #177, we first create a structure and then map it to ec_slave[1].inputs/outputs */
 		/* Here we define drive_RPDO as a pointer to drive_RPDO_t, and assign it a value equal to ec_slave[1].outputs */
 		/* drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
@@ -276,9 +276,12 @@ int main(int argc, char *argv[])
 							*/
 							printf(" %2.2x", *(ec_slave[1].inputs + j));
 						}
+						actualPos = ((*(ec_slave[1].inputs + 5))/10) * 1048576 + ((*(ec_slave[1].inputs + 5))%10) * 65536
+						           +((*(ec_slave[1].inputs + 4))/10) * 4096    + ((*(ec_slave[1].inputs + 4))%10) * 256
+                                   +((*(ec_slave[1].inputs + 3))/10) * 16      + ((*(ec_slave[1].inputs + 3))%10) * 1;
 						/* Move the active position to the beginning of the line, so that the next line is overwritten on
 						   the current one */
-						printf("\r");
+						printf("\n%d\n", actualPos);
 					}
 					
 				/* Sleep for 5 milliseconds */	
