@@ -150,21 +150,22 @@ void setModeCSP(uint16 slaveNum)
 
 void stateRequest(uint16 slaveNum, uint8 reqState)
 {
-	
+	/* Size of safe-op (the longest state messsage) = 7 + 1 = 8 */
+	char state[8];
 	/* Specify the desired state for the slave and then write it */
 	switch (reqState)
 	{
 		case 1:
-			char state[] = "init";
+			strcpy(state, "init");
 			break;
 		case 2:
-			char state[] = "pre-op";
+			strcpy(state, "pre-op");
 			break;
 		case 4:
-			char state[] = "safe-op";
+			strcpy(state,"safe-op");
 			break;
 		case 8:
-			char state[] = "op";
+			strcpy(state,"op");
 			break;
 		default:
 			printf("Requested state is not valid\n");
