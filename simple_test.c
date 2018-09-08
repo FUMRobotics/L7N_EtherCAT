@@ -217,6 +217,7 @@ int main(int argc, char *argv[])
    {
 		initialize(argv[1], 1);
 		readState(1);
+		setModeCSP(1);
 		/* Total size of slave 1 TPDOs, in bytes */
 		int slave_1_TPDO_size = ec_slave[1].Ibytes;
 		int i, j, chk;
@@ -270,8 +271,8 @@ int main(int argc, char *argv[])
 							   21 02 a9 5a 46 05
 							   and we have status word (0x6041) and position actual value (0x6064) as TPDOs of slave 1.
 							   Thus, 
-							   0x6041 = 0x0546
-							   0x6064 = 0x5AA90221
+							   0x6041 = 0x0221
+							   0x6064 = 0x05465AA9
 							*/
 							printf(" %2.2x", *(ec_slave[1].inputs + j));
 						}
