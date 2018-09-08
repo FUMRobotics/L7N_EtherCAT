@@ -276,9 +276,12 @@ int main(int argc, char *argv[])
 							*/
 							printf(" %2.2x", *(ec_slave[1].inputs + j));
 						}
-						actualPos = ((*(ec_slave[1].inputs + 5))/10) * 1048576 + ((*(ec_slave[1].inputs + 5))%10) * 65536
-						           +((*(ec_slave[1].inputs + 4))/10) * 4096    + ((*(ec_slave[1].inputs + 4))%10) * 256
-                                   +((*(ec_slave[1].inputs + 3))/10) * 16      + ((*(ec_slave[1].inputs + 3))%10) * 1;
+								    /* Extract the first number of the byte */      /* Extract the second number of the byte */
+									/* and multiply by powers of 16         */      /* and multiply by powers of 16          */
+						actualPos = ((*(ec_slave[1].inputs + 5))/10) * 1048576  +   ((*(ec_slave[1].inputs + 5))%10) * 65536
+						           +((*(ec_slave[1].inputs + 4))/10) * 4096     +   ((*(ec_slave[1].inputs + 4))%10) * 256
+                                   +((*(ec_slave[1].inputs + 3))/10) * 16       +   ((*(ec_slave[1].inputs + 3))%10) * 1;
+								   
 						/* Move the active position to the beginning of the line, so that the next line is overwritten on
 						   the current one */
 						printf("\n%d\n", actualPos);
