@@ -150,7 +150,7 @@ void setModeCSP(uint16 slaveNum)
 
 void stateRequest(uint16 slaveNum, uint8 reqState)
 {
-	/* Size of safe-op (the longest state messsage) = 7 + 1 = 8 */
+	/* Size of safe-op (the longest state messsage) = 7 + 1(\0) = 8 */
 	char state[8];
 	/* Specify the desired state for the slave and then write it */
 	switch (reqState)
@@ -220,8 +220,10 @@ int main(int argc, char *argv[])
 		setModeCSP(1);
 		/* Type inferred from example code in tutorial.txt */
 		uint8* input_ptr = ec_slave[1].inputs;
+		uint* output_ptr = ec_slave[1].outputs;
 		/* Total size of slave 1 TPDOs, in bytes */
 		int slave_1_TPDO_size = ec_slave[1].Ibytes;
+		int slave_1_RPDO_size = ec_slave[1].Obytes;
 		int i, j, chk, actualPos, targetPos;
 		/* According to issue #177, we first create a structure and then map it to ec_slave[1].inputs/outputs */
 		/* Here we define drive_RPDO as a pointer to drive_RPDO_t, and assign it a value equal to ec_slave[1].outputs */
@@ -293,14 +295,19 @@ int main(int argc, char *argv[])
 						   - In the first column, we obtain the first number of the byte, 8 in our example. 
 						   - In the second column, we obtain the second number of the byte, 7 in our case.
 						   - We then multiply the first number by 16 and add it to the second number to obtain the decimal representation of the byte */
+						/* This procedure becomes obvious by working out a solution for an arbitrary number */   
 						*(out_ptr + 2) = ((targetPos/16)%16)*16              +    (targetPos%16);
 						*(out_ptr + 3) = ((targetPos/(4096))%16)*16          +    ((targetPos/256)%16);
 						*(out_ptr + 4) = ((targetPos/(1048576))%16)*16       +    ((targetPos/65536)%16);
 						*(out_ptr + 5) = ((targetPos/(268435456))%16)*16     +    ((targetPos/16777216)%16);
 						
-						/* \r: Move the active position in terminal) to the beginning of the line, so that the next line is overwritten on
+						/* Unrelated note: "\r" moves the active position in terminal) to the beginning of the line, so that the next line is overwritten on
 						   the current one */
 						printf("\n%d\n", actualPos);
+						for(j = 0 ; j < slave_1_RPDO_size; j++)
+						{
+							printf(" %2.2x", *(ec_slave[1].outputs + j));
+						}
 					}
 					
 				/* Sleep for 5 milliseconds */	
