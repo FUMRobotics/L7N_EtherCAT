@@ -219,6 +219,7 @@ int main(int argc, char *argv[])
 	   int slave_1_TPDO_size = ec_slave[1].Ibytes;
 	   int slave_1_RPDO_size = ec_slave[1].Obytes;
 	   int i, j, chk, actualPos, targetPos;
+	   uint8 is_negative = 0;
 	   /* According to issue #177, we first create a structure and then map it to ec_slave[1].inputs/outputs */
 	   /* Here we define drive_RPDO as a pointer to drive_RPDO_t, and assign it a value equal to ec_slave[1].outputs */
 	   /* drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
@@ -273,12 +274,16 @@ int main(int argc, char *argv[])
 					   */
 					   printf(" %2.2x", *(ec_slave[1].inputs + j));
 				   }
+				   /* If *(input_ptr + 5)/16 >= 8 (i.e the most significant bit = 1, and the number is negative */
+				   if (*(input_ptr + 5)/16 >= 8)
+					is_negative = 1;
 				   /* Extract the first number of the byte */              /* Extract the second number of the byte */
 				   /* and multiply by powers of 16         */              /* and multiply by powers of 16          */
-				   actualPos = ((*(input_ptr + 5))/16) * 268435456         +   ((*(input_ptr + 5))%16) * 16777216
-					      +((*(input_ptr + 4))/16) * 1048576           +   ((*(input_ptr + 4))%16) * 65536
-					      +((*(input_ptr + 3))/16) * 4096              +   ((*(input_ptr + 3))%16) * 256
-					      +((*(input_ptr + 2))/16) * 16                +   ((*(input_ptr + 2))%16) * 1;
+				   actualPos = is_negative * -21247483648
+					       +((*(input_ptr + 5))/16) * 268435456         +   ((*(input_ptr + 5))%16) * 16777216
+					       +((*(input_ptr + 4))/16) * 1048576           +   ((*(input_ptr + 4))%16) * 65536
+					       +((*(input_ptr + 3))/16) * 4096              +   ((*(input_ptr + 3))%16) * 256
+					       +((*(input_ptr + 2))/16) * 16                +   ((*(input_ptr + 2))%16) * 1;
 						
 				   targetPos = actualPos;
 				   /* Convert the target position to hexadecimal representation, and place it each byte in the
