@@ -218,6 +218,8 @@ int main(int argc, char *argv[])
 		initialize(argv[1], 1);
 		readState(1);
 		setModeCSP(1);
+		/* Type inferred from example code in tutorial.txt */
+		uint8* input_ptr = ec_slave[1].inputs;
 		/* Total size of slave 1 TPDOs, in bytes */
 		int slave_1_TPDO_size = ec_slave[1].Ibytes;
 		int i, j, chk, actualPos;
@@ -278,9 +280,9 @@ int main(int argc, char *argv[])
 						}
 								    /* Extract the first number of the byte */      /* Extract the second number of the byte */
 									/* and multiply by powers of 16         */      /* and multiply by powers of 16          */
-						actualPos = ((*(ec_slave[1].inputs + 5))/10) * 1048576  +   ((*(ec_slave[1].inputs + 5))%10) * 65536
-						           +((*(ec_slave[1].inputs + 4))/10) * 4096     +   ((*(ec_slave[1].inputs + 4))%10) * 256
-                                   +((*(ec_slave[1].inputs + 3))/10) * 16       +   ((*(ec_slave[1].inputs + 3))%10) * 1;
+						actualPos = ((*(input_ptr + 5))/10) * 1048576           +   ((*(input_ptr + 5))%10) * 65536
+						           +((*(input_ptr + 4))/10) * 4096              +   ((*(input_ptr + 4))%10) * 256
+                                   +((*(input_ptr + 3))/10) * 16                +   ((*(input_ptr + 3))%10) * 1;
 								   
 						/* Move the active position to the beginning of the line, so that the next line is overwritten on
 						   the current one */
