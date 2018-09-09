@@ -8,8 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-/* This header is necessary for using the int64 format specifier, PRId64 */
-#include <inttypes.h>
+
 /* Size of IOmap = sum of sizes of RPDOs + TPDOs */
 /* Total size of RPDOs: ControlWord[16 bits] + Interpolation data record sub1[32 bits] = 48 bits
    Total size of TPDOs: StatusWord[16 bits] + Position actual value[32 bits] = 48 bits
@@ -260,7 +259,7 @@ int main(int argc, char *argv[])
 				   *(out_ptr + 4) = (targetPos >> 16) & 0xFF;
 				   *(out_ptr + 5) = (targetPos >> 24) & 0xFF;
 						
-				   /* Unrelated note: "\r" moves the active position in terminal) to the beginning of the line, so that the next line is overwritten on
+				   /* Unrelated note: "\r" moves the active position (in terminal) to the beginning of the line, so that the next line is overwritten on
 				   the current one */
 				   printf("\n%d\n", actualPos);
 				   for(j = 0 ; j < slave_1_RPDO_size; j++)
