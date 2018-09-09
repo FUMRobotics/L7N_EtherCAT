@@ -280,11 +280,12 @@ int main(int argc, char *argv[])
 						}
 								    /* Extract the first number of the byte */      /* Extract the second number of the byte */
 									/* and multiply by powers of 16         */      /* and multiply by powers of 16          */
-						actualPos = ((*(input_ptr + 5))/10) * 1048576           +   ((*(input_ptr + 5))%10) * 65536
-						           +((*(input_ptr + 4))/10) * 4096              +   ((*(input_ptr + 4))%10) * 256
-                                   +((*(input_ptr + 3))/10) * 16                +   ((*(input_ptr + 3))%10) * 1;
+						actualPos = ((*(input_ptr + 5))/16) * 268435456         +   ((*(input_ptr + 5))%16) * 16777216
+						           +((*(input_ptr + 4))/16) * 1048576           +   ((*(input_ptr + 4))%16) * 65536
+                                   +((*(input_ptr + 3))/16) * 4096              +   ((*(input_ptr + 3))%16) * 256
+								   +((*(input_ptr + 2))/16) * 16                +   ((*(input_ptr + 2))%16) * 1;
 								   
-						/* Move the active position to the beginning of the line, so that the next line is overwritten on
+						/* Move the active position in terminal) to the beginning of the line, so that the next line is overwritten on
 						   the current one */
 						printf("\n%d\n", actualPos);
 					}
