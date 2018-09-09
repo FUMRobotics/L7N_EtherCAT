@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
 		uint8* input_ptr = ec_slave[1].inputs;
 		/* Total size of slave 1 TPDOs, in bytes */
 		int slave_1_TPDO_size = ec_slave[1].Ibytes;
-		int i, j, chk, actualPos;
+		int i, j, chk, actualPos, targetPos;
 		/* According to issue #177, we first create a structure and then map it to ec_slave[1].inputs/outputs */
 		/* Here we define drive_RPDO as a pointer to drive_RPDO_t, and assign it a value equal to ec_slave[1].outputs */
 		/* drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
@@ -284,8 +284,21 @@ int main(int argc, char *argv[])
 						           +((*(input_ptr + 4))/16) * 1048576           +   ((*(input_ptr + 4))%16) * 65536
                                    +((*(input_ptr + 3))/16) * 4096              +   ((*(input_ptr + 3))%16) * 256
 								   +((*(input_ptr + 2))/16) * 16                +   ((*(input_ptr + 2))%16) * 1;
-								   
-						/* Move the active position in terminal) to the beginning of the line, so that the next line is overwritten on
+						
+						targetPos = actualPos;
+						/* Convert the target position to hexadecimal representation, and place it each byte in the
+						   appropriate position in memory */
+						/* For instance, assume the desired position is 1234567. The hexadecimal representation of this number
+						   will be 0x12D687. Therefore, we have to write 0x87 = 135 to *(out_ptr + 2).
+						   In the first column, we obtain the first number of the byte, 8 in our example. 
+						   In the second column, we obtain the second number of the byte, 7 in our case.
+						   We then multiply the first number by 16 and add it to the second number to obtain the decimal representation of the byte */
+						*(out_ptr + 2) = ((targetPos/16)%16)*16              +    (targetPos%16);
+						*(out_ptr + 3) = ((targetPos/(4096))%16)*16          +    ((targetPos/256)%16);
+						*(out_ptr + 4) = ((targetPos/(1048576))%16)*16       +    ((targetPos/65536)%16);
+						*(out_ptr + 5) = ((targetPos/(268435456))%16)*16     +    ((targetPos/16777216)%16);
+						
+						/* \r: Move the active position in terminal) to the beginning of the line, so that the next line is overwritten on
 						   the current one */
 						printf("\n%d\n", actualPos);
 					}
