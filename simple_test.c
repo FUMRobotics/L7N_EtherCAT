@@ -214,12 +214,12 @@ int main(int argc, char *argv[])
 	   setModeCSP(1);
 	   /* Type inferred from example code in tutorial.txt */
 	   uint8* input_ptr = ec_slave[1].inputs;
-	   uint* output_ptr = ec_slave[1].outputs;
+	   uint8* output_ptr = ec_slave[1].outputs;
 	   /* Total size of slave 1 TPDOs, in bytes */
 	   int slave_1_TPDO_size = ec_slave[1].Ibytes;
 	   int slave_1_RPDO_size = ec_slave[1].Obytes;
 	   int i, j, chk, actualPos, targetPos;
-	   uint8 is_negative = 0;
+	
 	   /* According to issue #177, we first create a structure and then map it to ec_slave[1].inputs/outputs */
 	   /* Here we define drive_RPDO as a pointer to drive_RPDO_t, and assign it a value equal to ec_slave[1].outputs */
 	   /* drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
@@ -279,10 +279,11 @@ int main(int argc, char *argv[])
 				   	
 				   targetPos = actualPos;
 				   
-				   *(out_ptr + 2) = (targetPos >> 0 )  & 0xFF;
-				   *(out_ptr + 3) = (targetPos >> 8 )  & 0xFF;
-				   *(out_ptr + 4) = (targetPos >> 16 ) & 0xFF;
-				   *(out_ptr + 5) = (targetPos >> 24 ) & 0xFF;
+				   /* See the definiton of set_output_int16 in https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */
+				   *(out_ptr + 2) = (targetPos >> 0)  & 0xFF;
+				   *(out_ptr + 3) = (targetPos >> 8)  & 0xFF;
+				   *(out_ptr + 4) = (targetPos >> 16) & 0xFF;
+				   *(out_ptr + 5) = (targetPos >> 24) & 0xFF;
 						
 				   /* Unrelated note: "\r" moves the active position in terminal) to the beginning of the line, so that the next line is overwritten on
 				   the current one */
