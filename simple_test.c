@@ -16,21 +16,6 @@
    Therefore, number of entries of IOmap = 96 bits/8 bits per char = 12 */
 char IOmap[12];
 
-/* For defining PDOs see issue #177 of SOEM's github and line 216 of tutorial.txt */
-typedef struct PACKED
-{
-   uint16 value_6040;
-   int32 value_607A;
-} drive_RPDO_t;
-drive_RPDO_t* drive_RPDO;
-
-typedef struct PACKED
-{
-   uint16 value_6041;
-   int32 value_6064;
-} drive_TPDO_t;
-drive_TPDO_t* drive_TPDO;
-
 void initialize (char* ifname, uint16 slaveNum)
 {
 /* See https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */	
@@ -220,16 +205,6 @@ int main(int argc, char *argv[])
 	   int slave_1_RPDO_size = ec_slave[1].Obytes;
 	   int i, j, chk, actualPos, targetPos;
 	
-	   /* According to issue #177, we first create a structure and then map it to ec_slave[1].inputs/outputs */
-	   /* Here we define drive_RPDO as a pointer to drive_RPDO_t, and assign it a value equal to ec_slave[1].outputs */
-	   /* drive_RPDO = (drive_RPDO_t*) ec_slave[1].outputs;
-	   drive_TPDO = (drive_TPDO_t*) ec_slave[1].inputs; */
-	   //ec_slave[0].state = EC_STATE_OPERATIONAL;
-	   /* send one valid process data to make outputs in slaves happy*/
-	   //ec_send_processdata();
-	   //ec_receive_processdata(EC_TIMEOUTRET);
-	   /* request OP state for all slaves */
-	   //ec_writestate(0);
 	   stateRequest(0, EC_STATE_OPERATIONAL);
 	   /* According to ETG_Diagnostics_with_EtherCAT document, each successful write to the slave's memory (RPDO, outputs in SOEM)
 	   increases the WKC by 2 and sucessful read (TPDO, inputs in SOEM) increments it by 1. */
