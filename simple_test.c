@@ -133,16 +133,17 @@ void stateRequest(uint16 slaveNum, uint8 reqState)
 	/* Specify the desired state for the slave and then write it */
 	switch (reqState)
 	{
-		case 1:
+		/* EC_STATE_INIT = 1. Refer ethercattypes.h for other values associated with states */
+		case EC_STATE_INIT:
 			strcpy(state, "init");
 			break;
-		case 2:
+		case EC_STATE_PRE_OP:
 			strcpy(state, "pre-op");
 			break;
-		case 4:
+		case EC_STATE_SAFE_OP:
 			strcpy(state,"safe-op");
 			break;
-		case 8:
+		case EC_STATE_OPERATIONAL:
 			strcpy(state,"op");
 			break;
 		default:
