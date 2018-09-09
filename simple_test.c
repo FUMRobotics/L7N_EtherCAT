@@ -274,16 +274,25 @@ int main(int argc, char *argv[])
 					   */
 					   printf(" %2.2x", *(ec_slave[1].inputs + j));
 				   }
-				   /* If *(input_ptr + 5)/16 >= 8 (i.e the most significant bit = 1, and the number is negative */
+				   /* If *(input_ptr + 5)/16 >= 8 (i.e the left-most bit = 1, and the number is negative */
 				   if (*(input_ptr + 5)/16 >= 8)
 					is_negative = 1;
-				   /* Extract the first number of the byte */              /* Extract the second number of the byte */
-				   /* and multiply by powers of 16         */              /* and multiply by powers of 16          */
+
+				   /* In case the number is negative, we have to ignore the left-most bit. Suppose 0x6064 = 0xB8563201.
+				      Since 0xB >= 8 (the left-most bit equals 1), the number is negative. So we have to ignore that bit and subtract 2^31 = 21247483648
+				      from the rest. Now, for the ignoring part: 0xB = 1010 -> 1 010, so instead of 10, we have to multiply 16^7 by 2.
+				      But 2 = 10 - 2 = (*(input_ptr + 5))/16 - 2.
+				      As another example lets say 0x6064 = 0xF1112222. Again, 0xF >= 8, so is_negative =1.
+				      0xF = 1111 = 1 111, so this time, we should multiply 16^7 by 111 = 7.
+				      Note that 7 = 15 - 8*is_negative, so it all works out in the formulas below. */
+				      
+			           /* Extract the first number of the byte */                                 /* Extract the second number of the byte */
+				   /* and multiply by powers of 16         */                                 /* and multiply by powers of 16          */
 				   actualPos = is_negative * -21247483648
-					       +((*(input_ptr + 5))/16) * 268435456         +   ((*(input_ptr + 5))%16) * 16777216
-					       +((*(input_ptr + 4))/16) * 1048576           +   ((*(input_ptr + 4))%16) * 65536
-					       +((*(input_ptr + 3))/16) * 4096              +   ((*(input_ptr + 3))%16) * 256
-					       +((*(input_ptr + 2))/16) * 16                +   ((*(input_ptr + 2))%16) * 1;
+					       +(((*(input_ptr + 5))/16) - 8*is_negative) * 268435456         +   ((*(input_ptr + 5))%16) * 16777216
+					       +((*(input_ptr + 4))/16) * 1048576                             +   ((*(input_ptr + 4))%16) * 65536
+					       +((*(input_ptr + 3))/16) * 4096                                +   ((*(input_ptr + 3))%16) * 256
+					       +((*(input_ptr + 2))/16) * 16                                  +   ((*(input_ptr + 2))%16) * 1;
 						
 				   targetPos = actualPos;
 				   /* Convert the target position to hexadecimal representation, and place it each byte in the
