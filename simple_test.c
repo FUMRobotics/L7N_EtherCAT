@@ -289,10 +289,10 @@ int main(int argc, char *argv[])
 						/* Convert the target position to hexadecimal representation, and place it each byte in the
 						   appropriate position in memory */
 						/* For instance, assume the desired position is 1234567. The hexadecimal representation of this number
-						   will be 0x12D687. Therefore, we have to write 0x87 = 135 to *(out_ptr + 2).
-						   In the first column, we obtain the first number of the byte, 8 in our example. 
-						   In the second column, we obtain the second number of the byte, 7 in our case.
-						   We then multiply the first number by 16 and add it to the second number to obtain the decimal representation of the byte */
+						   is 0x0012D687. Therefore, we have to write 0x87 = 135 to *(out_ptr + 2).
+						   - In the first column, we obtain the first number of the byte, 8 in our example. 
+						   - In the second column, we obtain the second number of the byte, 7 in our case.
+						   - We then multiply the first number by 16 and add it to the second number to obtain the decimal representation of the byte */
 						*(out_ptr + 2) = ((targetPos/16)%16)*16              +    (targetPos%16);
 						*(out_ptr + 3) = ((targetPos/(4096))%16)*16          +    ((targetPos/256)%16);
 						*(out_ptr + 4) = ((targetPos/(1048576))%16)*16       +    ((targetPos/65536)%16);
