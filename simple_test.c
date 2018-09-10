@@ -69,7 +69,7 @@ void ODwrite(uint16 slaveNum, uint16 Index, uint8 SubIndex, int32 objectValue)
 int32 ODread(uint16 slaveNum, uint16 Index, uint8 SubIndex)
 {
 	/* Usage : int val = ODread(1, 0x6040, 0x00);
-		   printf("%d", val);
+		   printf("%d", val); */
 	/* Note that we can use SDOread/write and therefore ODread/write after ec_config_init(FALSE), since init state is sufficient for SDO communication */
 	/* For checking whether SDO write is successful */
 	int result;
@@ -170,7 +170,7 @@ void stateRequest(uint16 slaveNum, uint8 reqState)
 		if (slaveNum == 0 )
 			printf("All slaves reached %s state\n", state);
 		else
-			printf("Slave %d reached %s state\n", state);
+			printf("Slave %d reached %s state\n", slaveNum, state);
 	}
 	else
 		printf("Not all slaves reached %s state\n", state);
