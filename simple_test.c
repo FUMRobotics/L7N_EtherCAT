@@ -204,6 +204,7 @@ int main(int argc, char *argv[])
 	   int slave_1_TPDO_size = ec_slave[1].Ibytes;
 	   int slave_1_RPDO_size = ec_slave[1].Obytes;
 	   int i, j, chk, actualPos, targetPos;
+	   int wkc, expectedWKC;
 	
 	   stateRequest(0, EC_STATE_OPERATIONAL);
 	   /* According to ETG_Diagnostics_with_EtherCAT document, each successful write to the slave's memory (RPDO, outputs in SOEM)
@@ -285,7 +286,7 @@ int main(int argc, char *argv[])
 		
 	   printf("\nRequesting init state for all slaves\n");
 	   stateRequest(0, EC_STATE_INIT);
-		
+	   }
 	   else
 	   {
 		   printf("Usage: simple_test ifname1\nifname = eth0 for example\n");
