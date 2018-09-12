@@ -154,7 +154,7 @@ void stateRequest(uint16 slaveNum, uint8 reqState)
 	ec_slave[slaveNum].state = reqState;
 	
 	/* Special procedure for operational state. See simple_test.c */
-	if (reqState == 8)
+	if (reqState == EC_STATE_OPERATIONAL)
 	{
 		/* send one valid process data to make outputs in slaves happy*/
 		ec_send_processdata();
