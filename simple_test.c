@@ -201,10 +201,12 @@ int main(int argc, char *argv[])
 	   uint8* input_ptr = ec_slave[1].inputs;
 	   uint8* output_ptr = ec_slave[1].outputs;
 	   /* Total size of slave 1 TPDOs, in bytes */
-	   int slave_1_TPDO_size = ec_slave[1].Ibytes;
+	   /*int slave_1_TPDO_size = ec_slave[1].Ibytes;
 	   int slave_1_RPDO_size = ec_slave[1].Obytes;
-	   int i, j, chk, actualPos, targetPos;
+	   int j; */
+	   int i, chk, actualPos, targetPos;
 	   int wkc, expectedWKC;
+	   uint16 controlword = 0xF;
 	
 	   stateRequest(0, EC_STATE_OPERATIONAL);
 	   /* According to ETG_Diagnostics_with_EtherCAT document, each successful write to the slave's memory (RPDO, outputs in SOEM)
@@ -225,7 +227,7 @@ int main(int argc, char *argv[])
 	   if (ec_slave[0].state == EC_STATE_OPERATIONAL )
 	   {
 		   printf("Operational state reached for all slaves.\n");
-		   for(i = 1; i <= 10000; i++)
+		   for(i = 1; i <= 20000; i++)
 		   {
 				
 			   ec_send_processdata();
@@ -237,8 +239,8 @@ int main(int argc, char *argv[])
 			   {
 						
 				   /* Write every byte of TPDOs of slave 1 in one line */
-				   for(j = 0 ; j < slave_1_TPDO_size; j++)
-				   {
+				   //for(j = 0 ; j < slave_1_TPDO_size; j++)
+				   //{
 					   /* ec_slave[1].inputs is a pointer to the first byte of slave 1 TPDOs.
 					      Therefore, each time we increment the address and then dereference it in order to write that byte */
 					   /* Now, suppose the printed line is
@@ -248,14 +250,17 @@ int main(int argc, char *argv[])
 					      0x6041 = 0x0221
 					      0x6064 = 0x05465AA9
 					   */
-					   printf(" %2.2x", *(ec_slave[1].inputs + j));
-				   }
+					   //printf(" %2.2x", *(ec_slave[1].inputs + j));
+				   //}
 				
 				   actualPos = (*(out_ptr + 5) << 24 ) + (*(out_ptr + 4) << 16 ) + (*(out_ptr + 3) << 8 ) + (*(out_ptr + 2) << 0 );
 				   	
-				   targetPos = actualPos;
+				   targetPos = actualPos + 10000;
 				   
 				   /* See the definiton of set_output_int16 in https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */
+				   *(out_ptr + 0) = (controlword >> 0) & 0xFF;
+				   *(out_ptr + 1) = (controlword >> 8) & 0xFF;
+				   
 				   *(out_ptr + 2) = (targetPos >> 0)  & 0xFF;
 				   *(out_ptr + 3) = (targetPos >> 8)  & 0xFF;
 				   *(out_ptr + 4) = (targetPos >> 16) & 0xFF;
@@ -264,10 +269,10 @@ int main(int argc, char *argv[])
 				   /* Unrelated note: "\r" moves the active position (in terminal) to the beginning of the line, so that the next line is overwritten on
 				   the current one */
 				   printf("\n%d\n", actualPos);
-				   for(j = 0 ; j < slave_1_RPDO_size; j++)
+				   /*for(j = 0 ; j < slave_1_RPDO_size; j++)
 				   {
-					   printf(" %2.2x", *(ec_slave[1].outputs + j));
-				   }
+					   //printf(" %2.2x", *(ec_slave[1].outputs + j));
+				   }*/
 			   }
 					
 			   /* Sleep for 5 milliseconds */
