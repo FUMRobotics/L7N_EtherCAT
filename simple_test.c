@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
 	   if (ec_slave[0].state == EC_STATE_OPERATIONAL )
 	   {
 		   printf("Operational state reached for all slaves.\n");
-		   for(i = 1; i <= 20000; i++)
+		   for(i = 1; i <= 2000; i++)
 		   {
 				
 			   ec_send_processdata();
