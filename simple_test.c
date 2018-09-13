@@ -195,7 +195,6 @@ int main(int argc, char *argv[])
    if (argc > 1)
    {
 	   initialize(argv[1], 1);
-	   readState(1);
 	   setModeCSP(1);
 	   /* Type inferred from example code in tutorial.txt */
 	   uint8* input_ptr = ec_slave[1].inputs;
@@ -260,12 +259,12 @@ int main(int argc, char *argv[])
 				   /* See the definiton of set_output_int16 in https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */
 				   *(output_ptr + 0) = (controlword >> 0) & 0xFF;
 				   *(output_ptr + 1) = (controlword >> 8) & 0xFF;
-				   
+
 				   *(output_ptr + 2) = (targetPos >> 0)  & 0xFF;
 				   *(output_ptr + 3) = (targetPos >> 8)  & 0xFF;
 				   *(output_ptr + 4) = (targetPos >> 16) & 0xFF;
 				   *(output_ptr + 5) = (targetPos >> 24) & 0xFF;
-						
+				   
 				   /* Unrelated note: "\r" moves the active position (in terminal) to the beginning of the line, so that the next line is overwritten on
 				   the current one */
 				   printf("\n%d\n", actualPos);
