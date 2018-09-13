@@ -253,18 +253,18 @@ int main(int argc, char *argv[])
 					   //printf(" %2.2x", *(ec_slave[1].inputs + j));
 				   //}
 				
-				   actualPos = (*(out_ptr + 5) << 24 ) + (*(out_ptr + 4) << 16 ) + (*(out_ptr + 3) << 8 ) + (*(out_ptr + 2) << 0 );
+				   actualPos = (*(input_ptr + 5) << 24 ) + (*(input_ptr + 4) << 16 ) + (*(input_ptr + 3) << 8 ) + (*(input_ptr + 2) << 0 );
 				   	
 				   targetPos = actualPos + 10000;
 				   
 				   /* See the definiton of set_output_int16 in https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */
-				   *(out_ptr + 0) = (controlword >> 0) & 0xFF;
-				   *(out_ptr + 1) = (controlword >> 8) & 0xFF;
+				   *(output_ptr + 0) = (controlword >> 0) & 0xFF;
+				   *(output_ptr + 1) = (controlword >> 8) & 0xFF;
 				   
-				   *(out_ptr + 2) = (targetPos >> 0)  & 0xFF;
-				   *(out_ptr + 3) = (targetPos >> 8)  & 0xFF;
-				   *(out_ptr + 4) = (targetPos >> 16) & 0xFF;
-				   *(out_ptr + 5) = (targetPos >> 24) & 0xFF;
+				   *(output_ptr + 2) = (targetPos >> 0)  & 0xFF;
+				   *(output_ptr + 3) = (targetPos >> 8)  & 0xFF;
+				   *(output_ptr + 4) = (targetPos >> 16) & 0xFF;
+				   *(output_ptr + 5) = (targetPos >> 24) & 0xFF;
 						
 				   /* Unrelated note: "\r" moves the active position (in terminal) to the beginning of the line, so that the next line is overwritten on
 				   the current one */
