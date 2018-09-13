@@ -25,13 +25,13 @@ void initialize (char* ifname, uint16 slaveNum)
 
 		if (ec_config_init(FALSE) > 0)
 		{		
-			printf("%d slaves found and PRE_OP state requested\n", ec_slavecount);
+			printf("%d slaves found and PRE_OP state requested for slave %d\n", ec_slavecount, slaveNum);
 				/* See red_test line 55 */
 				/* Passing 0 for the first argument means check All slaves */
 				/* ec_statecheck returns the value of the state, as defiend in ethercattypes.h (i.e. 4 for safe-op). 
 				   In case the fisrt argument is 0, it returns the value of the lowest state among all the slaves */
 				if (ec_statecheck(slaveNum, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
-					printf("All slaves reached PRE_OP state\n");
+					printf("Slave %d reached PRE_OP state\n", slaveNum);
 				
 				/* Due to a bug in EtherCAT implementation by Mecapion, we have to manually
 				   enable syncmanagers 2 & 3, which are associated with TPDO and RPDOs 
@@ -164,7 +164,7 @@ void stateRequest(uint16 slaveNum, uint8 reqState)
 	}
 	
 	ec_writestate(slaveNum);
-		
+	printf("State %s requested for slave %d", state, slaveNum);
 	if (ec_statecheck(slaveNum, reqState, EC_TIMEOUTSTATE) == reqState)
 	{
 		if (slaveNum == 0 )
