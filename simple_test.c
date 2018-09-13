@@ -25,34 +25,29 @@ void initialize (char* ifname, uint16 slaveNum)
 
 		if (ec_config_init(FALSE) > 0)
 		{		
-			printf("%d slaves found and PRE_OP state requested for slave %d\n", ec_slavecount, slaveNum);
+			printf("%d slaves found and PRE_OP state requested for all slaves\n", ec_slavecount);
 				/* See red_test line 55 */
 				/* Passing 0 for the first argument means check All slaves */
 				/* ec_statecheck returns the value of the state, as defiend in ethercattypes.h (i.e. 4 for safe-op). 
 				   In case the fisrt argument is 0, it returns the value of the lowest state among all the slaves */
-				if (ec_statecheck(slaveNum, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
+				if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
 					printf("Slave %d reached PRE_OP state\n", slaveNum);
-				
-				/* Due to a bug in EtherCAT implementation by Mecapion, we have to manually
-				   enable syncmanagers 2 & 3, which are associated with TPDO and RPDOs 
-				   respectively (p.26 of EtherCAT slave implementation guide). For more info,
-				   refer to SOEM issue #198 */
-				/* For some reason, setting the enable bit puts the drive in SAFE_OP mode */
-				ec_slave[slaveNum].SM[2].SMflags |= 0x00010000;
-				ec_slave[slaveNum].SM[3].SMflags |= 0x00010000;
-
-				/* We need to this just once, while we might run initialize for multiple slaves */
-				if (slaveNum == 1)
-				{
-				/* To do: - Run slaveinfo and this code without ec_config_map(&IOmap)
-				          - Find out what ec_config_map does */
- 				ec_config_map(&IOmap);
-				ec_configdc();
-				}
 		}
 	}
 }
 
+void enableSM23(uint16 slaveNum)
+{
+	
+	/* Due to a bug in EtherCAT implementation by Mecapion, we have to manually
+	   enable syncmanagers 2 & 3, which are associated with TPDO and RPDOs 
+	   respectively (p.26 of EtherCAT slave implementation guide). For more info,
+	   refer to SOEM issue #198 */
+	/* For some reason, setting the enable bit puts the drive in SAFE_OP mode */
+	ec_slave[slaveNum].SM[2].SMflags |= 0x00010000;
+	ec_slave[slaveNum].SM[3].SMflags |= 0x00010000;
+	
+}
 void ODwrite(uint16 slaveNum, uint16 Index, uint8 SubIndex, int32 objectValue)
 {
 	/* Note that we can use SDOread/write and therefore ODwrite/read after ec_config_init(FALSE), since init state is sufficient for SDO communication */
@@ -194,7 +189,14 @@ int main(int argc, char *argv[])
 
    if (argc > 1)
    {
-	   initialize(argv[1], 1);
+	   initialize(argv[1]);
+	   enableSM23(1);
+	   enableSM23(2);
+	   /* To do: - Run slaveinfo and this code without ec_config_map(&IOmap)
+		     - Find out what ec_config_map does */
+ 	   ec_config_map(&IOmap);
+	   ec_configdc();
+			
 	   faultReset(1);
 	   switchOn_enableOp(1);
 	   setModeCSP(1);
