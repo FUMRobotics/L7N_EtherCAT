@@ -189,6 +189,7 @@ int main(int argc, char *argv[])
 
    if (argc > 1)
    {
+	 
 	   initialize(argv[1]);
 	   enableSM23(1);
 	   enableSM23(2);
@@ -196,10 +197,14 @@ int main(int argc, char *argv[])
 		     - Find out what ec_config_map does */
  	   ec_config_map(&IOmap);
 	   ec_configdc();
-			
-	   faultReset(1);
-	   switchOn_enableOp(1);
-	   setModeCSP(1);
+	 	
+	   int i;
+	   for (i = 1; i <= ec_slavecount; i++)
+	   {
+		faultReset(i);
+		switchOn_enableOp(i);
+		setModeCSP(i);
+	   }
 	   /* Type inferred from example code in tutorial.txt */
 	   uint8* input_ptr = ec_slave[1].inputs;
 	   uint8* output_ptr = ec_slave[1].outputs;
@@ -207,7 +212,7 @@ int main(int argc, char *argv[])
 	   /*int slave_1_TPDO_size = ec_slave[1].Ibytes;
 	   int slave_1_RPDO_size = ec_slave[1].Obytes;
 	   int j; */
-	   int i, chk, actualPos, targetPos;
+	   int chk, actualPos, targetPos;
 	   int wkc, expectedWKC;
 	   uint16 controlword = 0xF;
 	
