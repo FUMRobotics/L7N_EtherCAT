@@ -159,7 +159,7 @@ void stateRequest(uint16 slaveNum, uint8 reqState)
 	}
 	
 	ec_writestate(slaveNum);
-	printf("State %s requested for slave %d", state, slaveNum);
+	printf("State %s requested for slave %d\n", state, slaveNum);
 	if (ec_statecheck(slaveNum, reqState, EC_TIMEOUTSTATE) == reqState)
 	{
 		if (slaveNum == 0 )
