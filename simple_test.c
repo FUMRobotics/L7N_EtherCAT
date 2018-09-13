@@ -205,14 +205,20 @@ int main(int argc, char *argv[])
 		switchOn_enableOp(i);
 		setModeCSP(i);
 	   }
+	   
 	   /* Type inferred from example code in tutorial.txt */
-	   uint8* input_ptr = ec_slave[1].inputs;
-	   uint8* output_ptr = ec_slave[1].outputs;
+	   uint8* input_ptr_1 = ec_slave[1].inputs;
+	   uint8* output_ptr_1 = ec_slave[1].outputs;
+	   
+	   uint8* input_ptr_2 = ec_slave[2].inputs;
+	   uint8* output_ptr_2 = ec_slave[2].outputs;
+	   
 	   /* Total size of slave 1 TPDOs, in bytes */
 	   /*int slave_1_TPDO_size = ec_slave[1].Ibytes;
 	   int slave_1_RPDO_size = ec_slave[1].Obytes;
 	   int j; */
-	   int chk, actualPos, targetPos;
+	   int chk;
+	   int actualPos_1, targetPos_1, actualPos_2, targetPos_2;
 	   int wkc, expectedWKC;
 	   uint16 controlword = 0xF;
 	
