@@ -267,22 +267,32 @@ int main(int argc, char *argv[])
 					   //printf(" %2.2x", *(ec_slave[1].inputs + j));
 				   //}
 				
-				   actualPos = (*(input_ptr + 5) << 24 ) + (*(input_ptr + 4) << 16 ) + (*(input_ptr + 3) << 8 ) + (*(input_ptr + 2) << 0 );
+				   actualPos_1 = (*(input_ptr_1 + 5) << 24 ) + (*(input_ptr_1 + 4) << 16 ) + (*(input_ptr_1 + 3) << 8 ) + (*(input_ptr_1 + 2) << 0 );
+				   actualPos_2 = (*(input_ptr_2 + 5) << 24 ) + (*(input_ptr_2 + 4) << 16 ) + (*(input_ptr_2 + 3) << 8 ) + (*(input_ptr_2 + 2) << 0 );
 				   	
-				   targetPos = actualPos + 10000;
-				   
+				   targetPos_1 = actualPos_1 + 200000;
+				   targetPos_2 = actualPos_2 + 200000;   
+				
 				   /* See the definiton of set_output_int16 in https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */
-				   *(output_ptr + 0) = (controlword >> 0) & 0xFF;
-				   *(output_ptr + 1) = (controlword >> 8) & 0xFF;
+				   *(output_ptr_1 + 0) = (controlword >> 0)  & 0xFF;
+				   *(output_ptr_1 + 1) = (controlword >> 8)  & 0xFF;
 
-				   *(output_ptr + 2) = (targetPos >> 0)  & 0xFF;
-				   *(output_ptr + 3) = (targetPos >> 8)  & 0xFF;
-				   *(output_ptr + 4) = (targetPos >> 16) & 0xFF;
-				   *(output_ptr + 5) = (targetPos >> 24) & 0xFF;
+				   *(output_ptr_1 + 2) = (targetPos_1 >> 0)  & 0xFF;
+				   *(output_ptr_1 + 3) = (targetPos_1 >> 8)  & 0xFF;
+				   *(output_ptr_1 + 4) = (targetPos_1 >> 16) & 0xFF;
+				   *(output_ptr_1 + 5) = (targetPos_1 >> 24) & 0xFF;
+				   
+				   *(output_ptr_2 + 0) = (controlword >> 0)  & 0xFF;
+				   *(output_ptr_2 + 1) = (controlword >> 8)  & 0xFF;
+
+				   *(output_ptr_2 + 2) = (targetPos_2 >> 0)  & 0xFF;
+				   *(output_ptr_2 + 3) = (targetPos_2 >> 8)  & 0xFF;
+				   *(output_ptr_2 + 4) = (targetPos_2 >> 16) & 0xFF;
+				   *(output_ptr_2 + 5) = (targetPos_2 >> 24) & 0xFF;
 				   
 				   /* Unrelated note: "\r" moves the active position (in terminal) to the beginning of the line, so that the next line is overwritten on
 				   the current one */
-				   printf("\n%d\n", actualPos);
+				   //	printf("\n%d\n", actualPos);
 				   /*for(j = 0 ; j < slave_1_RPDO_size; j++)
 				   {
 					   //printf(" %2.2x", *(ec_slave[1].outputs + j));
