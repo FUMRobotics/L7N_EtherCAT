@@ -195,6 +195,8 @@ int main(int argc, char *argv[])
    if (argc > 1)
    {
 	   initialize(argv[1], 1);
+	   faultReset(1);
+	   switchOn_enableOp(1);
 	   setModeCSP(1);
 	   /* Type inferred from example code in tutorial.txt */
 	   uint8* input_ptr = ec_slave[1].inputs;
