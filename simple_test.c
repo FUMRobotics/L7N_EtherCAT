@@ -18,6 +18,16 @@ char IOmap[12];
 void initialize (char* ifname)
 {
 /* See https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */	
+
+	/* ec_init(ifname) = ecx_setupnic((&ecx_context)->port, ifname, FALSE); From SOEM/oshw/linux/nicdrv.c: 
+	
+	* Basic setup to connect NIC to socket.
+        * @param[in] port        = port context struct
+        * @param[in] ifname      = Name of NIC device, f.e. "eth0"
+        * @param[in] secondary   = if >0 then use secondary stack instead of primary
+        * @return >0 if succeeded    
+        int ecx_setupnic(ecx_portt *port, const char *ifname, int secondary) 
+	*/
 	
 	if (ec_init(ifname))
 	{
