@@ -21,25 +21,38 @@ void initialize (char* ifname)
 
 	/* ec_init(ifname) = ecx_setupnic((&ecx_context)->port, ifname, FALSE); From SOEM/oshw/linux/nicdrv.c: 
 	
+	int ecx_setupnic(ecx_portt *port, const char *ifname, int secondary) 
 	* Basic setup to connect NIC to socket.
         * @param[in] port        = port context struct
         * @param[in] ifname      = Name of NIC device, f.e. "eth0"
         * @param[in] secondary   = if >0 then use secondary stack instead of primary
         * @return >0 if succeeded    
-        int ecx_setupnic(ecx_portt *port, const char *ifname, int secondary) 
+        * This function handles the network at socket level. Function body includes calls to function such as:
+	  ioctl, bind and setsocketopt, etc.
 	*/
 	
 	if (ec_init(ifname))
 	{
 		printf("ec_init on %s succeeded. \n",ifname);
-
+		
+		/* ec_config_init(FALSE) = ecx_config_init(&ecx_context, FALSE); From SOEM/soem/ethercatconfig.c: 
+		
+		int ecx_config_init(ecx_contextt *context, uint8 usetable)
+		* Enumerate and init all slaves.
+		* @param[in] context      = context struct
+		* @param[in] usetable     = TRUE when using configtable to init slaves, FALSE otherwise
+		* @return Workcounter of slave discover datagram = number of slaves found
+		  This function configures slaves. In its source you find:
+		  ecx_readeeprom1, slavelist[slave].SM[0].StartAddr = ... , slavelist[slave].CoEdetails = ... , etc.
+		*/
+		
 		if (ec_config_init(FALSE) > 0)
 		{		
 			printf("%d slaves found and PRE_OP state requested for all slaves\n", ec_slavecount);
 				/* See red_test line 55 */
 				/* Passing 0 for the first argument means check All slaves */
 				/* ec_statecheck returns the value of the state, as defiend in ethercattypes.h (i.e. 4 for safe-op). 
-				   In case the fisrt argument is 0, it returns the value of the lowest state among all the slaves */
+				   In case the first argument is 0, it returns the value of the lowest state among all the slaves */
 				if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
 					printf("Slave %d reached PRE_OP state\n", slaveNum);
 		}
