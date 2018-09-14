@@ -15,7 +15,7 @@
    Therefore, number of entries of IOmap = 96 bits/8 bits per char = 12 */
 char IOmap[12];
 
-void initialize (char* ifname, uint16 slaveNum)
+void initialize (char* ifname)
 {
 /* See https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */	
 	
