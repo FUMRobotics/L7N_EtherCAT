@@ -57,7 +57,7 @@ void initialize (char* ifname)
 				/* ec_statecheck returns the value of the state, as defiend in ethercattypes.h (i.e. 4 for safe-op). 
 				   In case the first argument is 0, it returns the value of the lowest state among all the slaves */
 				if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
-					printf("Slave %d reached PRE_OP state\n", slaveNum);
+					printf("All slaves reached PRE_OP state\n");
 		}
 	}
 }
