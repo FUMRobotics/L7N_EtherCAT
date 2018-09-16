@@ -9,6 +9,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <signal.h>
+#include <sys/types.h>
+
 /* Size of IOmap = sum of sizes of RPDOs + TPDOs */
 /* Total size of RPDOs: ControlWord[16 bits] + Interpolation data record sub1[32 bits] = 48 bits
    Total size of TPDOs: StatusWord[16 bits] + Position actual value[32 bits] = 48 bits
