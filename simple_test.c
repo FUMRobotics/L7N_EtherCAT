@@ -204,6 +204,18 @@ void readState(uint16 slaveNum)
 	printf("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", slaveNum, ec_slave[slaveNum].state, ec_slave[slaveNum].ALstatuscode, ec_ALstatuscode2string(ec_slave[slaveNum].ALstatuscode));
 }
 
+void signal_handler(int sig)
+{
+	
+	printf("Stopping process...%d\n", sig);
+	printf("\nRequesting init state for all slaves\n");
+	stateRequest(0, EC_STATE_INIT);
+	/* Kill the process in order to not request init state again after exiting the motion loop */
+	pid_t pid = getpid();
+	kill(pid, SIGKILL);
+	
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -212,6 +224,8 @@ int main(int argc, char *argv[])
 
    if (argc > 1)
    {
+	 
+	   signal(SIGINT, signal_handler);
 	 
 	   initialize(argv[1]);
 	   enableSM23(1);
