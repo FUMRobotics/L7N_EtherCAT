@@ -12,6 +12,9 @@
 #include <signal.h>
 #include <sys/types.h>
 
+/* One motor revolution increments the encoder by 2^19 -1 */
+#define ENCODER_RES 524287
+
 /* Size of IOmap = sum of sizes of RPDOs + TPDOs */
 /* Total size of RPDOs: ControlWord[16 bits] + Interpolation data record sub1[32 bits] = 48 bits
    Total size of TPDOs: StatusWord[16 bits] + Position actual value[32 bits] = 48 bits
@@ -262,6 +265,7 @@ int main(int argc, char *argv[])
 	   int wkc, expectedWKC;
 	   int framesMissed = 0;
 	   int framesTotal = 10000;
+	   int posIncrement = ENCODER_RES * 3;
 	   uint16 controlword = 0xF;
 	
 	   stateRequest(0, EC_STATE_OPERATIONAL);
@@ -312,8 +316,8 @@ int main(int argc, char *argv[])
 				   actualPos_1 = (*(input_ptr_1 + 5) << 24 ) + (*(input_ptr_1 + 4) << 16 ) + (*(input_ptr_1 + 3) << 8 ) + (*(input_ptr_1 + 2) << 0 );
 				   actualPos_2 = (*(input_ptr_2 + 5) << 24 ) + (*(input_ptr_2 + 4) << 16 ) + (*(input_ptr_2 + 3) << 8 ) + (*(input_ptr_2 + 2) << 0 );
 				   	
-				   targetPos_1 = actualPos_1 + 200000;
-				   targetPos_2 = actualPos_2 + 200000;   
+				   targetPos_1 = actualPos_1 + posIncrement;
+				   targetPos_2 = actualPos_2 - posIncrement;   
 				
 				   /* See the definiton of set_output_int16 in https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */
 				   *(output_ptr_1 + 0) = (controlword >> 0)  & 0xFF;
