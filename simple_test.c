@@ -14,8 +14,8 @@
 
 /* One motor revolution increments the encoder by 2^19 -1 */
 #define ENCODER_RES 524287
-/* Change to 1 to print bytes received and sent by master */
-#define DEBUG 0
+/* Uncomment to print bytes received and sent by master */
+//#define DEBUG
 
 /* Size of IOmap = sum of sizes of RPDOs + TPDOs */
 /* Total size of RPDOs: ControlWord[16 bits] + Interpolation data record sub1[32 bits] = 48 bits
@@ -299,9 +299,7 @@ if (argc > 1)
 			/* In other words, we check whether a slave couldn't read from/write to the incoming frame */
 			if(wkc >= expectedWKC)
 			{
-				   
-				if (DEBUG)
-				{		
+				#ifdef DEBUG
 					/* Write every byte of TPDOs of slave 1 in one line */
 					for(j = 0 ; j < slave_1_TPDO_size; j++)
 					        /* ec_slave[1].inputs is a pointer to the first byte of slave 1 TPDOs.
@@ -317,7 +315,8 @@ if (argc > 1)
 					   
 					
 					printf("\n");
-				}
+				#endif
+				
 				
 				actualPos_1 = (*(input_ptr_1 + 5) << 24 ) + (*(input_ptr_1 + 4) << 16 ) + (*(input_ptr_1 + 3) << 8 ) + (*(input_ptr_1 + 2) << 0 );
 				actualPos_2 = (*(input_ptr_2 + 5) << 24 ) + (*(input_ptr_2 + 4) << 16 ) + (*(input_ptr_2 + 3) << 8 ) + (*(input_ptr_2 + 2) << 0 );
@@ -342,14 +341,13 @@ if (argc > 1)
 				*(output_ptr_2 + 4) = (targetPos_2 >> 16) & 0xFF;
 				*(output_ptr_2 + 5) = (targetPos_2 >> 24) & 0xFF;
 				   
-				 /* Unrelated note: "\r" moves the active position (in terminal) to the beginning of the line, so that the next line is overwritten on
-				    the current one */
-				if (DEBUG)
-				{
+				/* Unrelated note: "\r" moves the active position (in terminal) to the beginning of the line, so that the next line is overwritten on
+				   the current one */
+				#ifdef DEBUG
 					for(j = 0 ; j < slave_1_RPDO_size; j++)
 						printf(" %2.2x", *(ec_slave[1].outputs + j));
 					printf("\n");
-				}
+				#endif
 				
 			}
 			else
