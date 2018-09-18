@@ -14,6 +14,8 @@
 
 /* One motor revolution increments the encoder by 2^19 -1 */
 #define ENCODER_RES 524287
+/* Change to 1 to print bytes received and sent by master */
+#define DEBUG 0
 
 /* Size of IOmap = sum of sizes of RPDOs + TPDOs */
 /* Total size of RPDOs: ControlWord[16 bits] + Interpolation data record sub1[32 bits] = 48 bits
@@ -226,151 +228,157 @@ void signal_handler(int sig)
 int main(int argc, char *argv[])
 {
 	
-   printf("SOEM (Simple Open EtherCAT Master)\nSimple test\n");
+	printf("SOEM (Simple Open EtherCAT Master)\nSimple test\n");
 
-   if (argc > 1)
-   {
+if (argc > 1)
+{
 	 
-	   signal(SIGINT, signal_handler);
+	signal(SIGINT, signal_handler);
 	 
-	   initialize(argv[1]);
-	   enableSM23(1);
-	   enableSM23(2);
-	   /* To do: - Run slaveinfo and this code without ec_config_map(&IOmap)
-		     - Find out what ec_config_map does */
- 	   ec_config_map(&IOmap);
-	   ec_configdc();
+	initialize(argv[1]);
+	enableSM23(1);
+	enableSM23(2);
+	/* To do: - Run slaveinfo and this code without ec_config_map(&IOmap)
+		  - Find out what ec_config_map does */
+ 	ec_config_map(&IOmap);
+	ec_configdc();
 	 	
-	   int i;
-	   for (i = 1; i <= ec_slavecount; i++)
-	   {
+	int i;
+	for (i = 1; i <= ec_slavecount; i++)
+	{
 		faultReset(i);
 		switchOn_enableOp(i);
 		setModeCSP(i);
-	   }
+	}
 	   
-	   /* Type inferred from example code in tutorial.txt */
-	   uint8* input_ptr_1 = ec_slave[1].inputs;
-	   uint8* output_ptr_1 = ec_slave[1].outputs;
+	/* Type inferred from example code in tutorial.txt */
+	uint8* input_ptr_1 = ec_slave[1].inputs;
+	uint8* output_ptr_1 = ec_slave[1].outputs;
 	   
-	   uint8* input_ptr_2 = ec_slave[2].inputs;
-	   uint8* output_ptr_2 = ec_slave[2].outputs;
+	uint8* input_ptr_2 = ec_slave[2].inputs;
+	uint8* output_ptr_2 = ec_slave[2].outputs;
 	   
-	   /* Total size of slave 1 TPDOs, in bytes */
-	   /*int slave_1_TPDO_size = ec_slave[1].Ibytes;
-	   int slave_1_RPDO_size = ec_slave[1].Obytes;
-	   int j; */
-	   int chk;
-	   int actualPos_1, targetPos_1, actualPos_2, targetPos_2;
-	   int wkc, expectedWKC;
-	   int framesMissed = 0;
-	   int framesTotal = 10000;
-	   int posIncrement = ENCODER_RES * 3;
-	   uint16 controlword = 0xF;
+	/* Total size of slave 1 TPDOs, in bytes */
+	int slave_1_TPDO_size = ec_slave[1].Ibytes;
+	int slave_1_RPDO_size = ec_slave[1].Obytes;
+	int j;
+	int chk;
+	int actualPos_1, targetPos_1, actualPos_2, targetPos_2;
+	int wkc, expectedWKC;
+	int framesMissed = 0;
+	int framesTotal = 100000;
+	int posIncrement = ENCODER_RES * 3;
+	uint16 controlword = 0xF;
 	
-	   stateRequest(0, EC_STATE_OPERATIONAL);
-	   /* According to ETG_Diagnostics_with_EtherCAT document, each successful write to the slave's memory (RPDO, outputs in SOEM)
+	stateRequest(0, EC_STATE_OPERATIONAL);
+	/* According to ETG_Diagnostics_with_EtherCAT document, each successful write to the slave's memory (RPDO, outputs in SOEM)
 	   increases the WKC by 2 and sucessful read (TPDO, inputs in SOEM) increments it by 1. */
-	   expectedWKC = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
-	   chk = 40;
-	   /* Wait for all slaves to reach OP state */
-	   /* The reason behind using this while loop: After the drive has entered OP state, we need to repeatedly send process data, at least every 100 ms.
+	expectedWKC = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
+	chk = 40;
+	/* Wait for all slaves to reach OP state */
+	/* The reason behind using this while loop: After the drive has entered OP state, we need to repeatedly send process data, at least every 100 ms.
 	   Otherwise, the Alarm 67 will be given by the drive. See EtherCAT error 0x001B. */
-	   do
-	   {
-		   ec_send_processdata();
-		   ec_receive_processdata(EC_TIMEOUTRET);
-		   /* EC_TIMEOUTSTATE is defined to be 2 seconds but as pointed out in comments above, we can't wait that long (drive shoud receive a frame every 100 ms) */
-		   ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
-	   }
-	   while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
-	   if (ec_slave[0].state == EC_STATE_OPERATIONAL )
-	   {
-		   printf("Operational state reached for all slaves.\n");
-		   for(i = 1; i <= framesTotal; i++)
-		   {
+	do
+	{
+		ec_send_processdata();
+		ec_receive_processdata(EC_TIMEOUTRET);
+		/* EC_TIMEOUTSTATE is defined to be 2 seconds but as pointed out in comments above, we can't wait that long (drive shoud receive a frame every 100 ms) */
+		ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
+	}
+	while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
+	if (ec_slave[0].state == EC_STATE_OPERATIONAL )
+	{
+		printf("Operational state reached for all slaves.\n");
+		for(i = 1; i <= framesTotal; i++)
+		{
 				
-			   ec_send_processdata();
-			   wkc = ec_receive_processdata(EC_TIMEOUTRET);
+			ec_send_processdata();
+			wkc = ec_receive_processdata(EC_TIMEOUTRET);
 					
-			   /* If RPDOs were sucessfully written to the slave and TPDO were written to EtherCAT frame. */
-			   /* In other words, we check whether a slave couldn't read from/write to the incoming frame */
-			   if(wkc >= expectedWKC)
-			   {
-						
-				   /* Write every byte of TPDOs of slave 1 in one line */
-				   //for(j = 0 ; j < slave_1_TPDO_size; j++)
-				   //{
-					   /* ec_slave[1].inputs is a pointer to the first byte of slave 1 TPDOs.
-					      Therefore, each time we increment the address and then dereference it in order to write that byte */
-					   /* Now, suppose the printed line is
-					      21 02 a9 5a 46 05
-					      and we have statusword (0x6041) and position actual value (0x6064) as TPDOs of slave 1.
-					      Thus, 
-					      0x6041 = 0x0221
-					      0x6064 = 0x05465AA9
-					   */
-					   //printf(" %2.2x", *(ec_slave[1].inputs + j));
-				   //}
+			/* If RPDOs were sucessfully written to the slave and TPDO were written to EtherCAT frame. */
+			/* In other words, we check whether a slave couldn't read from/write to the incoming frame */
+			if(wkc >= expectedWKC)
+			{
+				   
+				if (DEBUG)
+				{		
+					/* Write every byte of TPDOs of slave 1 in one line */
+					for(j = 0 ; j < slave_1_TPDO_size; j++)
+					
+					        /* ec_slave[1].inputs is a pointer to the first byte of slave 1 TPDOs.
+					           Therefore, each time we increment the address and then dereference it in order to write that byte */
+					        /* Now, suppose the printed line is
+					        21 02 a9 5a 46 05
+					        and we have statusword (0x6041) and position actual value (0x6064) as TPDOs of slave 1.
+					        Thus, 
+					        0x6041 = 0x0221
+					        0x6064 = 0x05465AA9
+					        */
+						printf(" %2.2x", *(ec_slave[1].inputs + j));
+					   
+					
+					printf("\n");
+				}
 				
-				   actualPos_1 = (*(input_ptr_1 + 5) << 24 ) + (*(input_ptr_1 + 4) << 16 ) + (*(input_ptr_1 + 3) << 8 ) + (*(input_ptr_1 + 2) << 0 );
-				   actualPos_2 = (*(input_ptr_2 + 5) << 24 ) + (*(input_ptr_2 + 4) << 16 ) + (*(input_ptr_2 + 3) << 8 ) + (*(input_ptr_2 + 2) << 0 );
+				actualPos_1 = (*(input_ptr_1 + 5) << 24 ) + (*(input_ptr_1 + 4) << 16 ) + (*(input_ptr_1 + 3) << 8 ) + (*(input_ptr_1 + 2) << 0 );
+				actualPos_2 = (*(input_ptr_2 + 5) << 24 ) + (*(input_ptr_2 + 4) << 16 ) + (*(input_ptr_2 + 3) << 8 ) + (*(input_ptr_2 + 2) << 0 );
 				   	
-				   targetPos_1 = actualPos_1 + posIncrement;
-				   targetPos_2 = actualPos_2 - posIncrement;   
+				targetPos_1 = actualPos_1 + posIncrement;
+				targetPos_2 = actualPos_2 - posIncrement;   
 				
-				   /* See the definiton of set_output_int16 in https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */
-				   *(output_ptr_1 + 0) = (controlword >> 0)  & 0xFF;
-				   *(output_ptr_1 + 1) = (controlword >> 8)  & 0xFF;
+				/* See the definiton of set_output_int16 in https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */
+				*(output_ptr_1 + 0) = (controlword >> 0)  & 0xFF;
+				*(output_ptr_1 + 1) = (controlword >> 8)  & 0xFF;
 
-				   *(output_ptr_1 + 2) = (targetPos_1 >> 0)  & 0xFF;
-				   *(output_ptr_1 + 3) = (targetPos_1 >> 8)  & 0xFF;
-				   *(output_ptr_1 + 4) = (targetPos_1 >> 16) & 0xFF;
-				   *(output_ptr_1 + 5) = (targetPos_1 >> 24) & 0xFF;
+				*(output_ptr_1 + 2) = (targetPos_1 >> 0)  & 0xFF;
+				*(output_ptr_1 + 3) = (targetPos_1 >> 8)  & 0xFF;
+				*(output_ptr_1 + 4) = (targetPos_1 >> 16) & 0xFF;
+				*(output_ptr_1 + 5) = (targetPos_1 >> 24) & 0xFF;
 				   
-				   *(output_ptr_2 + 0) = (controlword >> 0)  & 0xFF;
-				   *(output_ptr_2 + 1) = (controlword >> 8)  & 0xFF;
+				*(output_ptr_2 + 0) = (controlword >> 0)  & 0xFF;
+				*(output_ptr_2 + 1) = (controlword >> 8)  & 0xFF;
 
-				   *(output_ptr_2 + 2) = (targetPos_2 >> 0)  & 0xFF;
-				   *(output_ptr_2 + 3) = (targetPos_2 >> 8)  & 0xFF;
-				   *(output_ptr_2 + 4) = (targetPos_2 >> 16) & 0xFF;
-				   *(output_ptr_2 + 5) = (targetPos_2 >> 24) & 0xFF;
+				*(output_ptr_2 + 2) = (targetPos_2 >> 0)  & 0xFF;
+				*(output_ptr_2 + 3) = (targetPos_2 >> 8)  & 0xFF;
+				*(output_ptr_2 + 4) = (targetPos_2 >> 16) & 0xFF;
+				*(output_ptr_2 + 5) = (targetPos_2 >> 24) & 0xFF;
 				   
-				   /* Unrelated note: "\r" moves the active position (in terminal) to the beginning of the line, so that the next line is overwritten on
-				   the current one */
-				   //	printf("\n%d\n", actualPos);
-				   /*for(j = 0 ; j < slave_1_RPDO_size; j++)
-				   {
-					   //printf(" %2.2x", *(ec_slave[1].outputs + j));
-				   }*/
-			   }
-			   else
-				   framesMissed = framesMissed + 1;
+				 /* Unrelated note: "\r" moves the active position (in terminal) to the beginning of the line, so that the next line is overwritten on
+				    the current one */
+				if (DEBUG)
+				{
+					for(j = 0 ; j < slave_1_RPDO_size; j++)
+						printf(" %2.2x", *(ec_slave[1].outputs + j));
+					printf("\n");
+				}
+				
+			}
+			else
+				framesMissed = framesMissed + 1;
 					
-			   /* Sleep for 5 milliseconds */
-			   osal_usleep(5000);
-		   }
-	   }
-	   /* If, after running the loop for 40 times, not all slaves have reached OP state, */
-	   else
-	   {
-		   printf("Not all slaves reached operational state.\n");
-		   ec_readstate();
+		/* Sleep in microseconds */
+		osal_usleep(300);
+		}
+	}
+	/* If, after running the loop for 40 times, not all slaves have reached OP state, */
+	else
+	{
+		printf("Not all slaves reached operational state.\n");
+		ec_readstate();
 			
-		   for(i = 1; i<=ec_slavecount ; i++)
-			   readState(i);
-	   }
+		for(i = 1; i<=ec_slavecount ; i++)
+			readState(i);
+	}
 	   
-	   printf("Number of frames sent = %d\n", framesTotal);
-	   printf("Number of frames missed by slaves = %d\n", framesMissed);
+	printf("Number of frames sent = %d\n", framesTotal);
+		printf("Number of frames missed by slaves = %d\n", framesMissed);
 		
-	   printf("\nRequesting init state for all slaves\n");
+		printf("\nRequesting init state for all slaves\n");
 	   stateRequest(0, EC_STATE_INIT);
-	   }
-	   else
-	   {
-		   printf("Usage: simple_test ifname1\nifname = eth0 for example\n");
-	   }
-	   printf("End program\n");
-	   return 0;
+}
+else
+	printf("Usage: simple_test ifname1\nifname = eth0 for example\n");
+
+printf("End program\n");
+return 0;
 }
