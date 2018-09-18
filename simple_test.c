@@ -57,12 +57,12 @@ void initialize (char* ifname)
 		if (ec_config_init(FALSE) > 0)
 		{		
 			printf("%d slaves found and PRE_OP state requested for all slaves\n", ec_slavecount);
-				/* See red_test line 55 */
-				/* Passing 0 for the first argument means check All slaves */
-				/* ec_statecheck returns the value of the state, as defiend in ethercattypes.h (i.e. 4 for safe-op). 
-				   In case the first argument is 0, it returns the value of the lowest state among all the slaves */
-				if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
-					printf("All slaves reached PRE_OP state\n");
+			/* See red_test line 55 */
+			/* Passing 0 for the first argument means check All slaves */
+			/* ec_statecheck returns the value of the state, as defiend in ethercattypes.h (i.e. 4 for safe-op). 
+			   In case the first argument is 0, it returns the value of the lowest state among all the slaves */
+			if (ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE) == EC_STATE_PRE_OP)
+				printf("All slaves reached PRE_OP state\n");
 		}
 	}
 }
@@ -304,7 +304,6 @@ if (argc > 1)
 				{		
 					/* Write every byte of TPDOs of slave 1 in one line */
 					for(j = 0 ; j < slave_1_TPDO_size; j++)
-					
 					        /* ec_slave[1].inputs is a pointer to the first byte of slave 1 TPDOs.
 					           Therefore, each time we increment the address and then dereference it in order to write that byte */
 					        /* Now, suppose the printed line is
