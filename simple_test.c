@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-
+/* Headers for signal handling */
 #include <signal.h>
 #include <sys/types.h>
 
@@ -260,6 +260,8 @@ int main(int argc, char *argv[])
 	   int chk;
 	   int actualPos_1, targetPos_1, actualPos_2, targetPos_2;
 	   int wkc, expectedWKC;
+	   int framesMissed = 0;
+	   int framesTotal = 10000;
 	   uint16 controlword = 0xF;
 	
 	   stateRequest(0, EC_STATE_OPERATIONAL);
@@ -281,7 +283,7 @@ int main(int argc, char *argv[])
 	   if (ec_slave[0].state == EC_STATE_OPERATIONAL )
 	   {
 		   printf("Operational state reached for all slaves.\n");
-		   for(i = 1; i <= 2000; i++)
+		   for(i = 1; i <= framesTotal; i++)
 		   {
 				
 			   ec_send_processdata();
@@ -338,6 +340,8 @@ int main(int argc, char *argv[])
 					   //printf(" %2.2x", *(ec_slave[1].outputs + j));
 				   }*/
 			   }
+			   else
+				   framesMissed = framesMissed + 1;
 					
 			   /* Sleep for 5 milliseconds */
 			   osal_usleep(5000);
@@ -352,6 +356,9 @@ int main(int argc, char *argv[])
 		   for(i = 1; i<=ec_slavecount ; i++)
 			   readState(i);
 	   }
+	   
+	   printf("Number of frames sent = %d\n", framesTotal);
+	   printf("Number of frames missed by slaves = %d\n", framesMissed);
 		
 	   printf("\nRequesting init state for all slaves\n");
 	   stateRequest(0, EC_STATE_INIT);
