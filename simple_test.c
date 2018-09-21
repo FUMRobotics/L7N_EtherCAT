@@ -321,8 +321,8 @@ if (argc > 1)
 				actualPos_1 = (*(input_ptr_1 + 5) << 24 ) + (*(input_ptr_1 + 4) << 16 ) + (*(input_ptr_1 + 3) << 8 ) + (*(input_ptr_1 + 2) << 0 );
 				actualPos_2 = (*(input_ptr_2 + 5) << 24 ) + (*(input_ptr_2 + 4) << 16 ) + (*(input_ptr_2 + 3) << 8 ) + (*(input_ptr_2 + 2) << 0 );
 				   	
-				targetPos_1 = actualPos_1 + posIncrement;
-				targetPos_2 = actualPos_2 - posIncrement;   
+				targetPos_1 = actualPos_1 + i;
+				targetPos_2 = actualPos_2 - i;   
 				
 				/* See the definiton of set_output_int16 in https://openethercatsociety.github.io/doc/soem/tutorial_8txt.html */
 				*(output_ptr_1 + 0) = (controlword >> 0)  & 0xFF;
