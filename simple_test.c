@@ -354,7 +354,7 @@ if (argc > 1)
 				framesMissed = framesMissed + 1;
 					
 		/* Sleep in microseconds */
-		osal_usleep(300);
+		osal_usleep(800);
 		}
 	}
 	/* If, after running the loop for 40 times, not all slaves have reached OP state, */
