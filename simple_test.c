@@ -259,9 +259,11 @@ if (argc > 1)
 	uint8* output_ptr_2 = ec_slave[2].outputs;
 	   
 	/* Total size of slave 1 TPDOs, in bytes */
+	#ifdef DEBUG
 	int slave_1_TPDO_size = ec_slave[1].Ibytes;
 	int slave_1_RPDO_size = ec_slave[1].Obytes;
 	int j;
+	#endif
 	int chk;
 	int actualPos_1, targetPos_1, actualPos_2, targetPos_2;
 	int wkc, expectedWKC;
