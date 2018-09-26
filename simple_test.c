@@ -11,6 +11,9 @@
 /* Headers for signal handling */
 #include <signal.h>
 #include <sys/types.h>
+/* Header for using setpriority */
+#include <sys/time.h>
+#include <sys/resource.h>
 
 /* One motor revolution increments the encoder by 2^19 -1 */
 #define ENCODER_RES 524287
