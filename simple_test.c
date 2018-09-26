@@ -234,6 +234,10 @@ if (argc > 1)
 {
 	 
 	signal(SIGINT, signal_handler);
+	
+	pid_t pid = getpid();
+        if (setpriority(PRIO_PROCESS, pid, -19))
+		printf("Warning: Failed to set priority\n")
 	 
 	initialize(argv[1]);
 	enableSM23(1);
